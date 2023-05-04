@@ -1,36 +1,37 @@
 from django.urls import path
 from .views import *
+from rest_framework.routers import DefaultRouter
 
 app_name = "catalog"
 
-urlpatterns = [
-    path('adress_type/', AddressTypeView.as_view()),
-    path('contact/', ContactView.as_view()),
-    path('areas/', AreasView.as_view()),
-    path('citites/', CitiesView.as_view()),
-    path('client_category/', ClientCategoryView.as_view()),
-    path('category_type/', CategoryTypeView.as_view()),
-    path('work_type/', WorkTypeView.as_view()),
-    path('transaction_type/', TransactionTypeView.as_view()),
-    path('status/', StatusView.as_view()),
-    path('sector_econ/', SectorEconView.as_view()),
-    path('project_type/', ProjectTypeView.as_view()),
-    path('position_type/', PositionTypeView.as_view()),
-    path('period_type/', PeriodTypeView.as_view()),
-    path('payment_type/', PaymentTypeView.as_view()),
-    path('org_form/', OrgFormView.as_view()),
-    path('link_type/', LinkTypeView.as_view()),
-    path('line_type/', LineTypeView.as_view()),
-    path('idcard_type/', IdcardTypeView.as_view()),
-    path('form_property/', FormPropertyView.as_view()),
-    path('currencies/', CurrenciesView.as_view()),
-    path('credit_target/', CreditTargetView.as_view()),
-    path('credit_source/', CreditSourceView.as_view()),
-    path('country/', CountryView.as_view()),
-    path('counters/', CountersView.as_view()),
-    path('contact_type/', ContactTypeView.as_view()),
-    path('bank/', BankView.as_view()),
-    path('calculate/', CalculateView.as_view()),
-    path('base-account/', BaseAccountView.as_view()),
+router = DefaultRouter()
+router.register(r'address_type', AddressTypeViewSet)
+router.register(r'contact', ContactViewSet)
+router.register(r'areas', AreasViewSet)
+router.register(r'cities', CitiesViewSet)
+router.register(r'client_category', ClientCategoryViewSet)
+router.register(r'category_type', CategoryTypeViewSet)
+router.register(r'work_type', WorkTypeViewSet)
+router.register(r'transaction_type', TransactionTypeViewSet)
+router.register(r'status', StatusViewSet)
+router.register(r'sector_econ', SectorEconViewSet)
+router.register(r'project_type', ProjectTypeViewSet)
+router.register(r'position_type', PositionTypeViewSet)
+router.register(r'period_type', PeriodTypeViewSet)
+router.register(r'payment_type', PaymentTypeViewSet)
+router.register(r'org_form', OrgFormViewSet)
+router.register(r'link_type', LinkTypeViewSet)
+router.register(r'line_type', LineTypeViewSet)
+router.register(r'idcard_type', IdCardViewSet)
+router.register(r'form_property', FormPropertyViewSet)
+router.register(r'currencies', CurrenciesViewSet)
+router.register(r'credit_target', CreditTargetViewSet)
+router.register(r'credit_source', CreditSourceViewSet)
+router.register(r'country', CountryViewSet)
+router.register(r'counters', CountersViewSet)
+router.register(r'contact_type', ContactTypeViewSet)
+router.register(r'bank', BankViewSet)
+router.register(r'calculate', CalculateViewSet)
+router.register(r'base_account', BaseAccountViewSet)
 
-]
+urlpatterns = router.urls

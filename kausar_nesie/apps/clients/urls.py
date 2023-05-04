@@ -1,14 +1,16 @@
-from django.urls import path
 from .views import *
+from rest_framework.routers import DefaultRouter
 
 app_name = "clients"
 
-urlpatterns = [
-    path('individual_client/', IndividualClientView.as_view()),
-    path('adress/', AddressView.as_view()),
-    path('id-card/', IdCardView.as_view()),
-    path('account/', AccountView.as_view()),
-    path('company/', CompanyView.as_view()),
-    path('сlient/', ClientView.as_view()),
+router = DefaultRouter()
 
-]
+router.register(r'individual_client/', IndividualClientViewSet)
+router.register(r'adress', AddressViewSet)
+router.register(r'id-card', IdCardViewSet)
+router.register(r'account', AccountViewSet)
+router.register(r'company', CompanyViewSet)
+router.register(r'client', ClientViewSet)
+
+
+urlpatterns = router.urls
