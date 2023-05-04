@@ -14,7 +14,7 @@ class IndividualClient(models.Model):
         (FEMALE, 'Женский'),
     )
 
-    per_number = models.CharField(max_length=255, verbose_name="Номер per", blank=True)
+    per_number = models.CharField(max_length=255, verbose_name="Номер peг.", blank=True)
     name = models.CharField(max_length=255, verbose_name="Фамилия", blank=True)
     surname = models.CharField(max_length=255, verbose_name="Имя", blank=True)
     middle_name = models.CharField(max_length=255, verbose_name="Отчество", blank=True)
@@ -35,7 +35,7 @@ class IndividualClient(models.Model):
         return f"{self.surname} {self.name} {self.middle_name}"
 
     class Meta:
-        verbose_name = "Физичское лицо"
+        verbose_name = "Физическое лицо"
         verbose_name_plural = "Физические лица"
 
 
@@ -63,7 +63,7 @@ class Company(models.Model):
         return f"{self.short_name}"
 
     class Meta:
-        verbose_name = "Юридические лицо"
+        verbose_name = "Юридическое лицо"
         verbose_name_plural = "Юридические лица"
 
 
@@ -182,5 +182,5 @@ class IdCard(models.Model):
         return f"{self.client}"
 
     class Meta:
-        verbose_name = "Документы удостоверющие данные клиента"
-        verbose_name_plural = "Документы удостоверющие данные клиента"
+        verbose_name = "Документ удостоверяющое данные клиента"
+        verbose_name_plural = "Документы удостоверяющие данные клиента"
