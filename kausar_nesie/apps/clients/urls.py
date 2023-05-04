@@ -5,8 +5,8 @@ app_name = "clients"
 
 router = DefaultRouter()
 
-router.register(r'individual_client/', IndividualClientViewSet)
-router.register(r'adress', AddressViewSet)
+router.register(r'individual_client', IndividualClientViewSet)
+router.register(r'address', AddressViewSet)
 router.register(r'id-card', IdCardViewSet)
 router.register(r'account', AccountViewSet)
 router.register(r'company', CompanyViewSet)
