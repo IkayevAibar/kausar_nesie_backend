@@ -10,12 +10,24 @@ class IndividualClientViewSet(viewsets.ModelViewSet):
     serializer_class = IndividualClientSerializer
     permission_classes = [AllowAny]
 
+    def get_serializer_class(self):
+        # Используем IndividualClientReadOnlySerializer для чтения
+        if self.action == 'list' or self.action == 'retrieve':
+            return IndividualClientRetrieveSerializer
+        return self.serializer_class
+
 
 class AddressViewSet(viewsets.ModelViewSet):
     """Адреса клиента"""
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
     permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return AddressRetrieveSerializer
+        return self.serializer_class
+
 
 
 class ClientViewSet(viewsets.ModelViewSet):

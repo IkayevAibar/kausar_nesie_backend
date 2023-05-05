@@ -1,12 +1,21 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
-from apps.catalog.serializers import ContactSerializer
+from apps.catalog.serializers import ContactSerializer, CountrySerializer, ClientCategorySerializer, CitiesSerializer, AreasSerializer, AddressTypeSerializer
 
 
 class AddressSerializer(serializers.ModelSerializer):
     """Адреса клиента"""
 
+    class Meta:
+        model = Address
+        fields = "__all__"
+
+class AddressRetrieveSerializer(serializers.ModelSerializer):
+    """Адреса клиента"""
+    addr_type = AddressTypeSerializer(read_only=True)
+    cities = CitiesSerializer(read_only=True)
+    areas = AreasSerializer(read_only=True)
     class Meta:
         model = Address
         fields = "__all__"
@@ -56,10 +65,19 @@ class DocsSerializer(serializers.ModelSerializer):
 
 class IndividualClientSerializer(serializers.ModelSerializer):
     """Физическое лицо"""
-    docs = DocsSerializer(many=True, read_only=True)
-    addresses = AddressSerializer(many=True, read_only=True)
-    contacts = ContactSerializer(many=True, read_only=True)
-
     class Meta:
         model = IndividualClient
         fields = "__all__"
+
+class IndividualClientRetrieveSerializer(serializers.ModelSerializer):
+    """Физическое лицо"""
+    docs = DocsSerializer(many=True, read_only=True)
+    addresses = AddressSerializer(many=True, read_only=True)
+    contacts = ContactSerializer(many=True, read_only=True)
+    country = CountrySerializer(read_only=True)
+    client_category = ClientCategorySerializer(read_only=True)
+    
+    class Meta:
+        model = IndividualClient
+        fields = "__all__"
+    

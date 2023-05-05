@@ -232,3 +232,10 @@ class BaseAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseAccount
         fields = "__all__"
+
+class ContactRetrieveSerializer(serializers.ModelSerializer):
+    """Контакты"""
+    contact_type = ContactTypeSerializer(read_only=True)
+    class Meta:
+        model = Contact
+        fields = "__all__"
