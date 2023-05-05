@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
 User = get_user_model()
 
 
 class Contact(models.Model):
     """Контакты"""
 
+    client = models.ForeignKey("clients.IndividualClient", verbose_name="Контакт физического лица", on_delete=models.CASCADE, related_name='contacts')
     contact_type = models.CharField(max_length=255, verbose_name="Тип контакта", blank=True)
     value = models.CharField(max_length=255, verbose_name="Значение", blank=True)
 

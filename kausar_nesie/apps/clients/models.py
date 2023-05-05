@@ -29,8 +29,9 @@ class IndividualClient(models.Model):
     sic = models.CharField(max_length=255, verbose_name="СИК", blank=True)
     country = models.CharField(max_length=255, verbose_name="Страна", blank=True)
 
-    # client_category
-
+    client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="client_category", null=True, blank=True,
+                                      on_delete=models.SET_NULL)
+    
     def __str__(self):
         return f"{self.surname} {self.name} {self.middle_name}"
 
@@ -69,7 +70,7 @@ class Company(models.Model):
 
 class Docs(models.Model):
     """Документы"""
-
+    individual_client = models.ForeignKey("IndividualClient", on_delete=models.CASCADE, related_name='docs')
     identity_type = models.CharField(max_length=255, verbose_name="Тип удостоверения", blank=True)
     number = models.CharField(max_length=255, verbose_name="Номер", blank=True)
     series = models.CharField(max_length=255, verbose_name="Серия", blank=True)
@@ -87,6 +88,7 @@ class Docs(models.Model):
 
 class Address(models.Model):
     """Адреса клиента"""
+    client = models.ForeignKey(IndividualClient, verbose_name="Адрес физицеского лица", on_delete=models.CASCADE, related_name='addresses')
     post_index = models.CharField(max_length=10, verbose_name="Почтовый индекс", null=True, blank=True)
     cities = models.ForeignKey('catalog.Cities', verbose_name="Город", null=True, blank=True, on_delete=models.CASCADE)
     areas = models.ForeignKey('catalog.Areas', verbose_name="Область", null=True, blank=True, on_delete=models.CASCADE)

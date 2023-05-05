@@ -70,7 +70,7 @@ class Credit(models.Model):
                                          blank=False)
     is_affiliated = models.BooleanField(verbose_name="is_affiliated",
                                         null=True, default=True)
-    is_rate_fixed = models.BooleanField(verbose_name="is_affiliated",
+    is_rate_fixed = models.BooleanField(verbose_name="is_rate_fixed",
                                         null=True, default=True)
     insurance_amt = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="insurance_amt", null=False,
                                         blank=False)

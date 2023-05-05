@@ -1,13 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
-
-class IndividualClientSerializer(serializers.ModelSerializer):
-    """Физическое лицо"""
-
-    class Meta:
-        model = IndividualClient
-        fields = "__all__"
+from apps.catalog.serializers import ContactSerializer
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -49,4 +43,23 @@ class IdCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IdCard
+        fields = "__all__"
+
+class DocsSerializer(serializers.ModelSerializer):
+    """Документы"""
+
+    class Meta:
+        model = Docs
+        fields = "__all__"
+
+
+
+class IndividualClientSerializer(serializers.ModelSerializer):
+    """Физическое лицо"""
+    docs = DocsSerializer(many=True)
+    addresses = AddressSerializer(many=True)
+    contacts = ContactSerializer(many=True)
+
+    class Meta:
+        model = IndividualClient
         fields = "__all__"

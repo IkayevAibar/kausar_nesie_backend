@@ -17,3 +17,5 @@ __pycache__/
 
 credit_draw.py
 credit_draw_v2.py
+
+.vscode
