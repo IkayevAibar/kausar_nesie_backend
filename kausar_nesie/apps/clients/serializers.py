@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
-from apps.catalog.serializers import ContactSerializer, CountrySerializer, ClientCategorySerializer, CitiesSerializer, AreasSerializer, AddressTypeSerializer
+from apps.catalog.serializers import ContactRetrieveSerializer, CountrySerializer, ClientCategorySerializer, CitiesSerializer, AreasSerializer, AddressTypeSerializer
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -72,11 +72,11 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 class IndividualClientRetrieveSerializer(serializers.ModelSerializer):
     """Физическое лицо"""
     docs = DocsSerializer(many=True, read_only=True)
-    addresses = AddressSerializer(many=True, read_only=True)
-    contacts = ContactSerializer(many=True, read_only=True)
+    addresses = AddressRetrieveSerializer(many=True, read_only=True)
+    contacts = ContactRetrieveSerializer(many=True, read_only=True)
     country = CountrySerializer(read_only=True)
     client_category = ClientCategorySerializer(read_only=True)
-    
+
     class Meta:
         model = IndividualClient
         fields = "__all__"
