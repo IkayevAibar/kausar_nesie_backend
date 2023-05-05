@@ -29,7 +29,7 @@ class IndividualClient(models.Model):
     sic = models.CharField(max_length=255, verbose_name="СИК", blank=True)
     country = models.CharField(max_length=255, verbose_name="Страна", blank=True)
 
-    client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="client_category", null=True, blank=True,
+    client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
                                       on_delete=models.SET_NULL)
     
     def __str__(self):

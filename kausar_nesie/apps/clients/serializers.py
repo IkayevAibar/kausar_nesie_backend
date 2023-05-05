@@ -56,9 +56,9 @@ class DocsSerializer(serializers.ModelSerializer):
 
 class IndividualClientSerializer(serializers.ModelSerializer):
     """Физическое лицо"""
-    docs = DocsSerializer(many=True)
-    addresses = AddressSerializer(many=True)
-    contacts = ContactSerializer(many=True)
+    docs = DocsSerializer(many=True, read_only=True)
+    addresses = AddressSerializer(many=True, read_only=True)
+    contacts = ContactSerializer(many=True, read_only=True)
 
     class Meta:
         model = IndividualClient
