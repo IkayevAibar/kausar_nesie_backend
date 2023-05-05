@@ -11,6 +11,7 @@ router.register(r'id-card', IdCardViewSet)
 router.register(r'account', AccountViewSet)
 router.register(r'company', CompanyViewSet)
 router.register(r'client', ClientViewSet)
+router.register(r'doc', DocsViewSet)
 
 
 urlpatterns = router.urls

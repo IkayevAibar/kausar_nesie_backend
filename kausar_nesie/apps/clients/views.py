@@ -44,3 +44,9 @@ class IdCardViewSet(viewsets.ModelViewSet):
     queryset = IdCard.objects.all()
     serializer_class = IdCardSerializer
     permission_classes = [AllowAny]
+
+class DocsViewSet(viewsets.ModelViewSet):
+    """Документы"""
+    queryset = Docs.objects.all()
+    serializer_class = DocsSerializer
+    permission_classes = [AllowAny]
