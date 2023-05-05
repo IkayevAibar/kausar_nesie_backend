@@ -7,7 +7,7 @@ class Contact(models.Model):
     """Контакты"""
 
     client = models.ForeignKey("clients.IndividualClient", verbose_name="Контакт физического лица", on_delete=models.CASCADE, related_name='contacts')
-    contact_type = models.CharField(max_length=255, verbose_name="Тип контакта", blank=True)
+    contact_type = models.ForeignKey("ContactType", verbose_name="Тип контакта", on_delete=models.CASCADE, related_name='contact_type', blank=True)
     value = models.CharField(max_length=255, verbose_name="Значение", blank=True)
 
     def __str__(self):

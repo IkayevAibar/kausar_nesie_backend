@@ -24,11 +24,12 @@ class IndividualClient(models.Model):
     date_of_birth = models.DateField(verbose_name="Дата рождения", blank=True, default=timezone.now)
     place_of_birth = models.CharField(max_length=255, verbose_name="Место рождения", blank=True)
     rnn = models.CharField(max_length=255, verbose_name="РНН", blank=True)
-    is_resident = models.BooleanField(default=False, verbose_name="Резидент", blank=True)
+    is_resident = models.BooleanField(default=True, verbose_name="Резидент", blank=True)
     iin = models.CharField(max_length=255, verbose_name="ИИН", blank=True)
     sic = models.CharField(max_length=255, verbose_name="СИК", blank=True)
-    country = models.CharField(max_length=255, verbose_name="Страна", blank=True)
-
+    # country = models.CharField(max_length=255, verbose_name="Страна", blank=True)
+    country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True,
+                                      on_delete=models.SET_NULL)
     client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
                                       on_delete=models.SET_NULL)
     
@@ -168,7 +169,7 @@ class Account(models.Model):
 
 class IdCard(models.Model):
     """Документы удостоверющие данные клиента"""
-    type = models.ForeignKey('catalog.IdcardType', verbose_name="Идентификатор типа документа",
+    id_card_type = models.ForeignKey('catalog.IdcardType', verbose_name="Идентификатор типа документа",
                              on_delete=models.CASCADE,
                              blank=True, null=True)
     date_begin = models.DateField(verbose_name="Дата начала действия", null=False, blank=False)
