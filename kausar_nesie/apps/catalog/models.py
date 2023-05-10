@@ -611,7 +611,7 @@ class CreditType(models.Model):
                              blank=True, null=False)
     currency = models.ForeignKey(Currencies, verbose_name="Идентификатор валюты", on_delete=models.CASCADE,
                                  blank=True, null=False)
-    line_type = models.ForeignKey(LineType, verbose_name="Типы кредитных линий", verbose_name="line_type", on_delete=models.CASCADE,
+    line_type = models.ForeignKey(LineType, verbose_name="Типы кредитных линий", on_delete=models.CASCADE,
                                   blank=True, null=True)
     plan_type = models.IntegerField(verbose_name="Тип плана (Аннуитет, равными долями, ...)", blank=True, null=True)
     num_pattern = models.CharField(max_length=30, verbose_name="Шаблон номера договора", blank=True, null=True)
