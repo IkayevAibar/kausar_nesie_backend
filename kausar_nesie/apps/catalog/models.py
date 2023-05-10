@@ -291,7 +291,7 @@ class Currencies(models.Model):
         (DBB, 'ДВВ'),
     )
 
-    name = models.CharField(max_length=3, verbose_name="Наименование", blank=True, null=False)
+    name = models.CharField(max_length=15, verbose_name="Наименование", blank=True, null=False)
     alpha_code = models.CharField(max_length=3, verbose_name="Буквенный код валюты", blank=True, null=False)
     num_code = models.CharField(max_length=3, verbose_name="Цифровой код валюты", blank=True, null=False)
     curr_type = models.PositiveSmallIntegerField(
@@ -299,7 +299,7 @@ class Currencies(models.Model):
     )
 
     def __str__(self):
-        return f"{self.name} {self.code}"
+        return f"{self.name} {self.alpha_code} {self.num_code}"
 
     class Meta:
         verbose_name = "Справочник. Валюта"
@@ -611,7 +611,7 @@ class CreditType(models.Model):
                              blank=True, null=False)
     currency = models.ForeignKey(Currencies, verbose_name="Идентификатор валюты", on_delete=models.CASCADE,
                                  blank=True, null=False)
-    line_type = models.ForeignKey(LineType, verbose_name="line_type", on_delete=models.CASCADE,
+    line_type = models.ForeignKey(LineType, verbose_name="Типы кредитных линий", verbose_name="line_type", on_delete=models.CASCADE,
                                   blank=True, null=True)
     plan_type = models.IntegerField(verbose_name="Тип плана (Аннуитет, равными долями, ...)", blank=True, null=True)
     num_pattern = models.CharField(max_length=30, verbose_name="Шаблон номера договора", blank=True, null=True)

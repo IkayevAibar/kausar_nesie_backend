@@ -31,9 +31,9 @@ class Credit(models.Model):
                              blank=True, null=True)
     ex_rate = models.DecimalField(max_digits=16, decimal_places=4, verbose_name="Значение курса при выдаче", null=True,
                                   blank=True)
-    date_begin = models.DateField(verbose_name="дата начала", null=False, blank=False)
-    date_end = models.DateField(verbose_name="дата окончания", null=False, blank=False)
-    date_close = models.DateField(verbose_name="дата закрытия", null=True, blank=True)
+    date_begin = models.DateField(verbose_name="Дата начала", null=False, blank=False)
+    date_end = models.DateField(verbose_name="Дата окончания", null=False, blank=False)
+    date_close = models.DateField(verbose_name="Дата закрытия", null=True, blank=True)
     to_cash = models.BooleanField(verbose_name="Реквизиты для выдачи. Через кассу",
                                   null=False, default=False)
     req_acc = models.CharField(max_length=35, verbose_name="Реквизиты для выдачи. Счет", blank=True, null=True)
@@ -43,7 +43,7 @@ class Credit(models.Model):
     req_name = models.CharField(max_length=255, verbose_name="Реквизиты для выдачи. Клиент", blank=True, null=True)
     req_kbe = models.CharField(max_length=2, verbose_name="Реквизиты для выдачи. КБе", blank=True, null=True)
     date_sign = models.DateField(verbose_name="Дата подписания договора", null=True, blank=True)
-    depart = models.ForeignKey("catalog.Departament", verbose_name="Реквизиты для выдачи. Банк",
+    depart = models.ForeignKey("catalog.Departament", verbose_name="Реквизиты для выдачи. Отдел",
                                on_delete=models.CASCADE,
                                blank=True,
                                null=True)
