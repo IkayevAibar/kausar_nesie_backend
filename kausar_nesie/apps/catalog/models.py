@@ -77,7 +77,7 @@ class CategoryType(models.Model):
 
     name = models.CharField(max_length=255, verbose_name="Название", blank=True, null=False)
     code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
-    provision_prc = models.IntegerField(verbose_name="provision_prc", blank=True, null=True)
+    provision_prc = models.FloatField(verbose_name="provision_prc", blank=True, null=True)
     provision_from = models.FloatField(
         verbose_name="Минимальный размер провизии по стандарту национального банка",
         blank=True, null=True)
