@@ -209,6 +209,14 @@ class CollateralTypeSerializer(serializers.ModelSerializer):
         model = CollateralType
         fields = "__all__"
 
+class DeptTypeSerializer(serializers.ModelSerializer):
+    """Справочник. Виды задолженностей"""
+
+    class Meta:
+        model = DeptType
+        fields = "__all__"
+
+
 
 class BankSerializer(serializers.ModelSerializer):
     """Справочник. Банки"""

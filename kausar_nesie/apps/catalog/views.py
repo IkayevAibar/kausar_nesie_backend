@@ -189,6 +189,12 @@ class CollateralTypeViewSet(viewsets.ModelViewSet):
     serializer_class = CollateralTypeSerializer
     permission_classes = [AllowAny]
 
+class DeptTypeViewSet(viewsets.ModelViewSet):
+    """Справочник. Виды задолженностей"""
+    queryset = DeptType.objects.all()
+    serializer_class = DeptTypeSerializer
+    permission_classes = [AllowAny]
+
 
 class BankViewSet(viewsets.ModelViewSet):
     """Справочник. Банки"""
