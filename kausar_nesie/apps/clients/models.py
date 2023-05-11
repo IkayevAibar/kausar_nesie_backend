@@ -47,11 +47,11 @@ class Company(models.Model):
     short_name = models.CharField(max_length=2000, verbose_name="Короткое наименование", blank=True)
     full_name = models.CharField(max_length=2000, verbose_name="Полное наименование", blank=True)
     client = models.ForeignKey("Client", verbose_name="client_id", null=False, blank=False, on_delete=models.CASCADE)
-    sector = models.ForeignKey('catalog.SectorEcon', verbose_name="sector_id", null=True, blank=True,
+    sector = models.ForeignKey('catalog.SectorEcon', verbose_name="Сектор Экономики", null=True, blank=True,
                                on_delete=models.CASCADE)
-    org_form = models.ForeignKey('catalog.OrgForm', verbose_name="sector_id", null=True, blank=True,
+    org_form = models.ForeignKey('catalog.OrgForm', verbose_name="Форма предприятия", null=True, blank=True,
                                  on_delete=models.CASCADE)
-    form_property = models.ForeignKey('catalog.FormProperty', verbose_name="form_property", null=True, blank=True,
+    form_property = models.ForeignKey('catalog.FormProperty', verbose_name="Форма собс.", null=True, blank=True,
                                       on_delete=models.CASCADE)
 
     okpo = models.CharField(max_length=255, verbose_name="ОКПО", blank=True)

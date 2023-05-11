@@ -215,3 +215,66 @@ class BaseAccountViewSet(viewsets.ModelViewSet):
     queryset = BaseAccount.objects.all()
     serializer_class = BaseAccountSerializer
     permission_classes = [AllowAny]
+
+class AccountPatternViewSet(viewsets.ModelViewSet):
+    """Шаблоны номеров счетов"""
+    queryset = AccountPattern.objects.all()
+    serializer_class = AccountPatternSerializer
+    permission_classes = [AllowAny]
+
+class AccountTypeViewSet(viewsets.ModelViewSet):
+    """Справочник. Типы счетов"""
+    queryset = AccountType.objects.all()
+    serializer_class = AccountTypeSerializer
+    permission_classes = [AllowAny]
+
+class DepartamentViewSet(viewsets.ModelViewSet):
+    """Справочник. Отделы"""
+    queryset = Departament.objects.all()
+    serializer_class = DepartamentSerializer
+    permission_classes = [AllowAny]
+
+class PaymentRuleViewSet(viewsets.ModelViewSet):
+    """Правила гашения"""
+    queryset = PaymentRule.objects.all()
+    serializer_class = PaymentRuleSerializer
+    permission_classes = [AllowAny]
+
+class CreditTypeViewSet(viewsets.ModelViewSet):
+    """Справочник. Типы кредитов"""
+    queryset = CreditType.objects.all()
+    serializer_class = CreditTypeSerializer
+    permission_classes = [AllowAny]
+
+class InterestSchemeViewSet(viewsets.ModelViewSet):
+    """Справочник. Схемы начисления процентов"""
+    queryset = InterestScheme.objects.all()
+    serializer_class = InterestSchemeSerializer
+    permission_classes = [AllowAny]
+
+class InterestRateViewSet(viewsets.ModelViewSet):
+    """Ставки. Схемы начисления процентов"""
+    queryset = InterestRate.objects.all()
+    serializer_class = InterestRateSerializer
+    permission_classes = [AllowAny]
+
+
+class InterestJournalViewSet(viewsets.ModelViewSet):
+    """Журнал начисленных процентов"""
+    queryset = InterestJournal.objects.all()
+    serializer_class = InterestJournalSerializer
+    permission_classes = [AllowAny]
+
+
+class InsuranceViewSet(viewsets.ModelViewSet):
+    """Договора страхования"""
+    queryset = Insurance.objects.all()
+    serializer_class = InsuranceSerializer
+    permission_classes = [AllowAny]
+
+class InsuranceLinkViewSet(viewsets.ModelViewSet):
+    """Связь с договорами страхования"""
+    queryset = InsuranceLink.objects.all()
+    serializer_class = InsuranceLinkSerializer
+    permission_classes = [AllowAny]
+

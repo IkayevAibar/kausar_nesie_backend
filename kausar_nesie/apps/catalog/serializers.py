@@ -247,3 +247,73 @@ class ContactRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = "__all__"
+
+class AccountPatternSerializer(serializers.ModelSerializer):
+    """Шаблоны номеров счетов"""
+
+    class Meta:
+        model = AccountPattern
+        fields = "__all__"
+
+class AccountTypeSerializer(serializers.ModelSerializer):
+    """Справочник. Типы счетов"""
+
+    class Meta:
+        model = AccountType
+        fields = "__all__"
+
+class DepartamentSerializer(serializers.ModelSerializer):
+    """Справочник. Отделы"""
+
+    class Meta:
+        model = Departament
+        fields = "__all__"
+
+class PaymentRuleSerializer(serializers.ModelSerializer):
+    """Правила гашения"""
+
+    class Meta:
+        model = PaymentRule
+        fields = "__all__"
+
+class CreditTypeSerializer(serializers.ModelSerializer):
+    """Справочник. Типы кредитов"""
+
+    class Meta:
+        model = CreditType
+        fields = "__all__"
+
+class InterestSchemeSerializer(serializers.ModelSerializer):
+    """Справочник. Схемы начисления процентов"""
+
+    class Meta:
+        model = InterestScheme
+        fields = "__all__"
+
+class InterestRateSerializer(serializers.ModelSerializer):
+    """Ставки. Схемы начисления процентов"""
+
+    class Meta:
+        model = InterestRate
+        fields = "__all__"
+
+class InterestJournalSerializer(serializers.ModelSerializer):
+    """Журнал начисленных процентов"""
+
+    class Meta:
+        model = InterestJournal
+        fields = "__all__"
+
+class InsuranceSerializer(serializers.ModelSerializer):
+    """Договора страхования"""
+
+    class Meta:
+        model = Insurance
+        fields = "__all__"
+
+class InsuranceLinkSerializer(serializers.ModelSerializer):
+    """Связь с договорами страхования"""
+
+    class Meta:
+        model = InsuranceLink
+        fields = "__all__"
