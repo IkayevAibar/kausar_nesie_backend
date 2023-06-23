@@ -25,19 +25,6 @@ class CitiesViewSet(viewsets.ModelViewSet):
     serializer_class = CitiesSerializer
     permission_classes = [AllowAny]
 
-
-class ContactViewSet(viewsets.ModelViewSet):
-    """Контакты"""
-    queryset = Contact.objects.all()
-    serializer_class = ContactSerializer
-    permission_classes = [AllowAny]
-
-    def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return ContactRetrieveSerializer
-        return self.serializer_class
-
-
 class ClientCategoryViewSet(viewsets.ModelViewSet):
     """Справочник. Категории клиентов"""
     queryset = ClientCategory.objects.all()

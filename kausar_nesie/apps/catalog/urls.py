@@ -6,7 +6,6 @@ app_name = "catalog"
 
 router = DefaultRouter()
 router.register(r'address_type', AddressTypeViewSet)
-router.register(r'contact', ContactViewSet)
 router.register(r'areas', AreasViewSet)
 router.register(r'cities', CitiesViewSet)
 router.register(r'client_category', ClientCategoryViewSet)

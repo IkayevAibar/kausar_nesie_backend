@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import *
-from apps.catalog.serializers import ContactRetrieveSerializer, CountrySerializer, ClientCategorySerializer, CitiesSerializer, AreasSerializer, AddressTypeSerializer
 
+from django.contrib.auth import get_user_model
+
+from .models import *
+from apps.catalog.serializers import *
 
 class AddressSerializer(serializers.ModelSerializer):
     """Адреса клиента"""
@@ -20,12 +21,10 @@ class AddressRetrieveSerializer(serializers.ModelSerializer):
         model = Address
         fields = "__all__"
 
-
-class ClientSerializer(serializers.ModelSerializer):
-    """Клиенты"""
-
+class IndividualClientSerializer(serializers.ModelSerializer):
+    """Физическое лицо"""
     class Meta:
-        model = Client
+        model = IndividualClient
         fields = "__all__"
 
 
@@ -45,15 +44,6 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-class IdCardSerializer(serializers.ModelSerializer):
-    """Документы удостоверющие данные клиента"""
-
-
-    class Meta:
-        model = IdCard
-        fields = "__all__"
-
 class DocsSerializer(serializers.ModelSerializer):
     """Документы"""
 
@@ -62,22 +52,70 @@ class DocsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ContactSerializer(serializers.ModelSerializer):
+    """Контакты"""
 
-class IndividualClientSerializer(serializers.ModelSerializer):
-    """Физическое лицо"""
     class Meta:
-        model = IndividualClient
+        model = Contact
+        fields = "__all__"
+
+
+class ContactRetrieveSerializer(serializers.ModelSerializer):
+    """Контакты"""
+    contact_type = ContactTypeSerializer(read_only=True)
+    class Meta:
+        model = Contact
         fields = "__all__"
 
 class IndividualClientRetrieveSerializer(serializers.ModelSerializer):
     """Физическое лицо"""
-    docs = DocsSerializer(many=True, read_only=True)
-    addresses = AddressRetrieveSerializer(many=True, read_only=True)
-    contacts = ContactRetrieveSerializer(many=True, read_only=True)
     country = CountrySerializer(read_only=True)
     client_category = ClientCategorySerializer(read_only=True)
+    place_of_birth = AreasSerializer(read_only=True)
 
     class Meta:
         model = IndividualClient
         fields = "__all__"
     
+
+class ClientRetrieveSerializer(serializers.ModelSerializer):
+    """Клиенты"""
+    individual_client = IndividualClientRetrieveSerializer(required=False)
+    docs = DocsSerializer(many=True, read_only=True)
+    addresses = AddressRetrieveSerializer(many=True, read_only=True)
+    contacts = ContactRetrieveSerializer(many=True, read_only=True)
+    companies = CompanySerializer(many=True)
+
+    class Meta:
+        model = Client
+        fields = "__all__"
+
+class ClientSerializer(serializers.ModelSerializer):  
+    individual_client = IndividualClientRetrieveSerializer(required=False)
+    class Meta:
+        model = Client
+        fields = "__all__"
+    
+    def create(self, validated_data):
+        companies_data = validated_data.pop('companies', None)
+        individual_client_data = validated_data.pop('individual_client', None)
+        client = Client.objects.create(**validated_data)
+
+        if individual_client_data:
+            individual_client = IndividualClient.objects.create(**individual_client_data)
+            client.individual_client = individual_client
+            client.companies.set(companies_data)
+            client.save()
+
+        return client
+
+
+class CompanyRetrieveSerializer(serializers.ModelSerializer):
+    """Юр лица"""
+    sector = SectorEconSerializer(read_only=True)
+    org_form = OrgFormSerializer(read_only=True)
+    form_property = FormPropertySerializer(read_only=True)
+    owners = ClientSerializer(read_only=True, many=True)
+    class Meta:
+        model = Company
+        fields = "__all__"

@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
 from .serializers import *
 from .models import *
 
@@ -36,12 +38,24 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
 
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return ClientRetrieveSerializer
+        return self.serializer_class
+
+
+
 
 class CompanyViewSet(viewsets.ModelViewSet):
     """Юр лица"""
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return CompanyRetrieveSerializer
+        return self.serializer_class
 
 
 class AccountViewSet(viewsets.ModelViewSet):
@@ -51,14 +65,21 @@ class AccountViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
-class IdCardViewSet(viewsets.ModelViewSet):
-    """Документы удостоверющие данные клиента"""
-    queryset = IdCard.objects.all()
-    serializer_class = IdCardSerializer
-    permission_classes = [AllowAny]
 
 class DocsViewSet(viewsets.ModelViewSet):
     """Документы"""
     queryset = Docs.objects.all()
     serializer_class = DocsSerializer
     permission_classes = [AllowAny]
+
+class ContactViewSet(viewsets.ModelViewSet):
+    """Контакты"""
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return ContactRetrieveSerializer
+        return self.serializer_class
+

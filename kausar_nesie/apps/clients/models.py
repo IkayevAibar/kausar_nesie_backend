@@ -14,22 +14,18 @@ class IndividualClient(models.Model):
         (FEMALE, 'Женский'),
     )
 
-    per_number = models.CharField(max_length=255, verbose_name="Номер peг.", blank=True)
-    name = models.CharField(max_length=255, verbose_name="Фамилия", blank=True)
-    surname = models.CharField(max_length=255, verbose_name="Имя", blank=True)
-    middle_name = models.CharField(max_length=255, verbose_name="Отчество", blank=True)
-    sex = models.PositiveSmallIntegerField(
-        choices=GENDER_CHOICES, null=True, blank=True, verbose_name=("Пол")
-    )
-    date_of_birth = models.DateField(verbose_name="Дата рождения", blank=True, default=timezone.now)
-    place_of_birth = models.CharField(max_length=255, verbose_name="Место рождения", blank=True)
+    reg_number = models.CharField(max_length=255, unique=True, verbose_name="Номер peг.", blank=True, null=False)
+    name = models.CharField(max_length=255, verbose_name="Имя", blank=True, null=False)
+    surname = models.CharField(max_length=255, verbose_name="Фамилия", blank=True, null=False)
+    middle_name = models.CharField(max_length=255, verbose_name="Отчество", blank=True, null=True)
+    gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=False, blank=False, verbose_name=("Пол"))
+    date_of_birth = models.DateField(verbose_name="Дата рождения", null=False, blank=True, default=timezone.now)
+    place_of_birth = models.ForeignKey('catalog.Areas', verbose_name="Место рождения", null=False, blank=False, on_delete=models.CASCADE)
     rnn = models.CharField(max_length=255, verbose_name="РНН", blank=True)
-    is_resident = models.BooleanField(default=True, verbose_name="Резидент", blank=True)
     iin = models.CharField(max_length=255, verbose_name="ИИН", blank=True)
     sic = models.CharField(max_length=255, verbose_name="СИК", blank=True)
-    # country = models.CharField(max_length=255, verbose_name="Страна", blank=True)
-    country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True,
-                                      on_delete=models.SET_NULL)
+    is_resident = models.BooleanField(default=True, verbose_name="Резидент", blank=True)
+    country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True,on_delete=models.SET_NULL)
     client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
                                       on_delete=models.SET_NULL)
     
@@ -40,20 +36,17 @@ class IndividualClient(models.Model):
         verbose_name = "Физическое лицо"
         verbose_name_plural = "Физические лица"
 
-
 class Company(models.Model):
     """Юридические лица"""
 
     short_name = models.CharField(max_length=2000, verbose_name="Короткое наименование", blank=True)
     full_name = models.CharField(max_length=2000, verbose_name="Полное наименование", blank=True)
-    client = models.ForeignKey("Client", verbose_name="client_id", null=False, blank=False, on_delete=models.CASCADE)
     sector = models.ForeignKey('catalog.SectorEcon', verbose_name="Сектор Экономики", null=True, blank=True,
                                on_delete=models.CASCADE)
     org_form = models.ForeignKey('catalog.OrgForm', verbose_name="Форма предприятия", null=True, blank=True,
                                  on_delete=models.CASCADE)
     form_property = models.ForeignKey('catalog.FormProperty', verbose_name="Форма собс.", null=True, blank=True,
                                       on_delete=models.CASCADE)
-
     okpo = models.CharField(max_length=255, verbose_name="ОКПО", blank=True)
     reg_num = models.CharField(max_length=255, verbose_name="Регистрационный номер", blank=True)
     reg_date = models.DateField(verbose_name="Дата регистрации", blank=True, default=timezone.now)
@@ -61,6 +54,7 @@ class Company(models.Model):
     certify_ser = models.CharField(max_length=20, verbose_name="Серия рег. удостоверения", blank=True)
     certify_num = models.CharField(max_length=20, verbose_name="Номер рег. удостоврения", blank=True)
 
+    owners = models.ManyToManyField('Client', related_name='company_owners', blank=True)
     def __str__(self):
         return f"{self.short_name}"
 
@@ -68,17 +62,35 @@ class Company(models.Model):
         verbose_name = "Юридическое лицо"
         verbose_name_plural = "Юридические лица"
 
+class Client(models.Model):
+    """Клиенты"""
+    emp = models.ForeignKey(User, related_name="manager", verbose_name="Идентификатор пользователя создавшего запись",
+                            on_delete=models.SET_NULL, blank=True, null=True)
+    insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)
+    individual_client = models.OneToOneField(IndividualClient, on_delete=models.CASCADE, null=True, blank=True)
+    companies = models.ManyToManyField('Company', related_name='client_companies', blank=True, through=Company.owners.through)
+    
+    def __str__(self):
+        if(self.individual_client):
+            return f"{self.individual_client.name} {self.individual_client.surname} {self.individual_client.middle_name}"
+        return f"{self.id}"
+
+    class Meta:
+        verbose_name = "Клиент"
+        verbose_name_plural = "Клиенты"
 
 class Docs(models.Model):
     """Документы"""
-    individual_client = models.ForeignKey("IndividualClient", on_delete=models.CASCADE, related_name='docs')
-    identity_type = models.CharField(max_length=255, verbose_name="Тип удостоверения", blank=True)
+    client = models.ForeignKey("Client", on_delete=models.CASCADE, related_name='docs')
+    identity_card_type = models.ForeignKey('catalog.IdcardType', verbose_name="Идентификатор типа документа",
+                             on_delete=models.CASCADE,
+                             blank=True, null=True)
     number = models.CharField(max_length=255, verbose_name="Номер", blank=True)
     series = models.CharField(max_length=255, verbose_name="Серия", blank=True)
     start_date = models.DateField(verbose_name="Дата начала", blank=True, default=timezone.now)
     end_date = models.DateField(verbose_name="Дата окончания", blank=True, default=timezone.now)
     issued_by = models.CharField(max_length=255, verbose_name="Кем выдан", blank=True)
-
+    scan = models.FileField(upload_to='docs/', verbose_name="Сканированная копия документа", null=False, blank=False)
     def __str__(self):
         return f"{self.number}"
 
@@ -89,7 +101,7 @@ class Docs(models.Model):
 
 class Address(models.Model):
     """Адреса клиента"""
-    client = models.ForeignKey(IndividualClient, verbose_name="Адрес физицеского лица", on_delete=models.CASCADE, related_name='addresses')
+    client = models.ForeignKey(Client, verbose_name="Адрес физицеского лица", on_delete=models.CASCADE, related_name='addresses')
     post_index = models.CharField(max_length=10, verbose_name="Почтовый индекс", null=True, blank=True)
     cities = models.ForeignKey('catalog.Cities', verbose_name="Город", null=True, blank=True, on_delete=models.CASCADE)
     areas = models.ForeignKey('catalog.Areas', verbose_name="Область", null=True, blank=True, on_delete=models.CASCADE)
@@ -107,30 +119,6 @@ class Address(models.Model):
         verbose_name = "Адрес клиента"
         verbose_name_plural = "Адреса клиента"
 
-
-class Client(models.Model):
-    """Клиенты"""
-    name = models.CharField(max_length=2000, verbose_name="Полное наименование", null=False, blank=False)
-    is_individual = models.BooleanField(default=False, verbose_name="Физ.лицо", blank=True, null=True)
-    emp = models.ForeignKey(User, verbose_name="Идентификатор пользователя создавшего запись",
-                            on_delete=models.SET_NULL, blank=True, null=True)
-    insert_date = models.DateField(auto_now_add=True,
-                                   verbose_name='Дата ввода записи')
-    rnn = models.CharField(max_length=2000, verbose_name="РНН", null=True, blank=True)
-    idn = models.CharField(max_length=2000, verbose_name="ИИН/БИН", null=True, blank=True)
-    resident = models.BooleanField(default=False, verbose_name="Резидент", blank=True, null=True)
-    country = models.ForeignKey('catalog.Country', verbose_name="Юрисдикция/гражданство", on_delete=models.SET_NULL,
-                                blank=True, null=True)
-    category = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", on_delete=models.SET_NULL,
-                                 blank=True, null=True)
-    reg_num = models.BigIntegerField(verbose_name="Регистрационный номер", blank=True, null=False)
-
-    def __str__(self):
-        return f"{self.name}"
-
-    class Meta:
-        verbose_name = "Клиент"
-        verbose_name_plural = "Клиенты"
 
 
 class Account(models.Model):
@@ -167,23 +155,37 @@ class Account(models.Model):
         verbose_name_plural = "Счета"
 
 
-class IdCard(models.Model):
-    """Документы удостоверющие данные клиента"""
-    id_card_type = models.ForeignKey('catalog.IdcardType', verbose_name="Идентификатор типа документа",
-                             on_delete=models.CASCADE,
-                             blank=True, null=True)
-    date_begin = models.DateField(verbose_name="Дата начала действия", null=False, blank=False)
-    date_end = models.DateField(verbose_name="дата окончания действия", null=True, blank=True)
-    who = models.TextField(verbose_name="Кем выдан", blank=True, null=True)
-    num_passport = models.TextField(verbose_name="Номер документа", blank=False, null=False)
-    serial_passport = models.TextField(verbose_name="Серия документа", blank=True, null=True)
-    client = models.ForeignKey(Client, verbose_name="Идентификатор клиента", on_delete=models.CASCADE,
-                               blank=True, null=True)
-    scan = models.FileField(upload_to='docs/', verbose_name="Сканированная копия документа", null=False, blank=False)
+class Contact(models.Model):
+    """Контакты"""
+
+    client = models.ForeignKey("Client", verbose_name="Контакт физического лица", on_delete=models.CASCADE, related_name='contacts')
+    contact_type = models.ForeignKey("catalog.ContactType", verbose_name="Тип контакта", on_delete=models.CASCADE, related_name='contact_type', blank=True)
+    value = models.CharField(max_length=255, verbose_name="Значение", blank=True)
 
     def __str__(self):
-        return f"{self.client}"
+        return f"{self.contact_type} {self.value}"
 
     class Meta:
-        verbose_name = "Документ удостоверяющое данные клиента"
-        verbose_name_plural = "Документы удостоверяющие данные клиента"
+        verbose_name = "Контакт"
+        verbose_name_plural = "Контакты"
+
+# class IdCard(models.Model):
+#     """Документы удостоверющие данные клиента"""
+#     id_card_type = models.ForeignKey('catalog.IdcardType', verbose_name="Идентификатор типа документа",
+#                              on_delete=models.CASCADE,
+#                              blank=True, null=True)
+#     date_begin = models.DateField(verbose_name="Дата начала действия", null=False, blank=False)
+#     date_end = models.DateField(verbose_name="дата окончания действия", null=True, blank=True)
+#     who = models.TextField(verbose_name="Кем выдан", blank=True, null=True)
+#     num_passport = models.TextField(verbose_name="Номер документа", blank=False, null=False)
+#     serial_passport = models.TextField(verbose_name="Серия документа", blank=True, null=True)
+#     client = models.ForeignKey(Client, verbose_name="Идентификатор клиента", on_delete=models.CASCADE,
+#                                blank=True, null=True)
+#     scan = models.FileField(upload_to='docs/', verbose_name="Сканированная копия документа", null=False, blank=False)
+
+#     def __str__(self):
+#         return f"{self.client}"
+
+#     class Meta:
+#         verbose_name = "Документ удостоверяющое данные клиента"
+#         verbose_name_plural = "Документы удостоверяющие данные клиента"

@@ -18,14 +18,6 @@ class CitiesSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ContactSerializer(serializers.ModelSerializer):
-    """Контакты"""
-
-    class Meta:
-        model = Contact
-        fields = "__all__"
-
-
 class AreasSerializer(serializers.ModelSerializer):
     """Справочник. Области"""
 
@@ -241,12 +233,6 @@ class BaseAccountSerializer(serializers.ModelSerializer):
         model = BaseAccount
         fields = "__all__"
 
-class ContactRetrieveSerializer(serializers.ModelSerializer):
-    """Контакты"""
-    contact_type = ContactTypeSerializer(read_only=True)
-    class Meta:
-        model = Contact
-        fields = "__all__"
 
 class AccountPatternSerializer(serializers.ModelSerializer):
     """Шаблоны номеров счетов"""

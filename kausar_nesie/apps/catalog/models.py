@@ -3,20 +3,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class Contact(models.Model):
-    """Контакты"""
-
-    client = models.ForeignKey("clients.IndividualClient", verbose_name="Контакт физического лица", on_delete=models.CASCADE, related_name='contacts')
-    contact_type = models.ForeignKey("ContactType", verbose_name="Тип контакта", on_delete=models.CASCADE, related_name='contact_type', blank=True)
-    value = models.CharField(max_length=255, verbose_name="Значение", blank=True)
-
-    def __str__(self):
-        return f"{self.contact_type} {self.value}"
-
-    class Meta:
-        verbose_name = "Контакт"
-        verbose_name_plural = "Контакты"
-
 
 class Cities(models.Model):
     """Справочник. Населенные пункты"""
@@ -57,6 +43,30 @@ class Areas(models.Model):
         verbose_name = "Справочник. Область"
         verbose_name_plural = "Справочник. Области"
 
+class District(models.Model):
+    """Справочник. Районы"""
+
+    name = models.CharField(max_length=255, verbose_name="Название", blank=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Справочник. Район"
+        verbose_name_plural = "Справочник. Районы"
+
+
+class Street(models.Model):
+    """Справочник. Улицы"""
+
+    name = models.CharField(max_length=255, verbose_name="Название", blank=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Справочник. Улица"
+        verbose_name_plural = "Справочник. Улицы"
 
 class ClientCategory(models.Model):
     """Справочник. Категории клиентов"""
@@ -141,7 +151,7 @@ class Status(models.Model):
 
 
 class SectorEcon(models.Model):
-    """Справочник.Сектора экономики"""
+    """Справочник. Сектора экономики"""
 
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
@@ -150,8 +160,8 @@ class SectorEcon(models.Model):
         return f"{self.name} {self.code}"
 
     class Meta:
-        verbose_name = "Справочник.Сектор экономики"
-        verbose_name_plural = "Справочник.Сектора экономики"
+        verbose_name = "Справочник. Сектор экономики"
+        verbose_name_plural = "Справочник. Сектора экономики"
 
 
 class ProjectType(models.Model):
@@ -239,7 +249,7 @@ class LinkType(models.Model):
 
 
 class LineType(models.Model):
-    """Справочник.Типы кредитных линий"""
+    """Справочник. Типы кредитных линий"""
 
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
@@ -248,12 +258,12 @@ class LineType(models.Model):
         return f"{self.name} {self.code}"
 
     class Meta:
-        verbose_name = "Справочник.Тип кредитных линий"
-        verbose_name_plural = "Справочник.Типы кредитных линий"
+        verbose_name = "Справочник. Тип кредитных линий"
+        verbose_name_plural = "Справочник. Типы кредитных линий"
 
 
 class IdcardType(models.Model):
-    """Справочник.Типы документов"""
+    """Справочник. Типы документов"""
 
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
@@ -263,7 +273,7 @@ class IdcardType(models.Model):
 
     class Meta:
         verbose_name = "Справочник.Тип документов"
-        verbose_name_plural = "Справочник.Типы документов"
+        verbose_name_plural = "Справочник. Типы документов"
 
 
 class FormProperty(models.Model):
