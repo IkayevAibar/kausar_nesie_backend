@@ -35,6 +35,16 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = "__all__"
 
+class CompanyInClientRetrieveSerializer(serializers.ModelSerializer):
+    """Юр лица"""
+    sector = SectorEconSerializer(read_only=True)
+    org_form = OrgFormSerializer(read_only=True)
+    form_property = FormPropertySerializer(read_only=True)
+
+    class Meta:
+        model = Company
+        exclude = ['owners']
+
 
 class AccountSerializer(serializers.ModelSerializer):
     """Счета"""
@@ -84,27 +94,25 @@ class ClientRetrieveSerializer(serializers.ModelSerializer):
     docs = DocsSerializer(many=True, read_only=True)
     addresses = AddressRetrieveSerializer(many=True, read_only=True)
     contacts = ContactRetrieveSerializer(many=True, read_only=True)
-    companies = CompanySerializer(many=True)
+    companies = CompanyInClientRetrieveSerializer(many=True, read_only=True, source="company_owners")
 
     class Meta:
         model = Client
         fields = "__all__"
 
 class ClientSerializer(serializers.ModelSerializer):  
-    individual_client = IndividualClientRetrieveSerializer(required=False)
+    individual_client = IndividualClientSerializer(required=False)
     class Meta:
         model = Client
         fields = "__all__"
     
     def create(self, validated_data):
-        companies_data = validated_data.pop('companies', None)
         individual_client_data = validated_data.pop('individual_client', None)
         client = Client.objects.create(**validated_data)
 
         if individual_client_data:
             individual_client = IndividualClient.objects.create(**individual_client_data)
             client.individual_client = individual_client
-            client.companies.set(companies_data)
             client.save()
 
         return client
@@ -118,4 +126,10 @@ class CompanyRetrieveSerializer(serializers.ModelSerializer):
     owners = ClientSerializer(read_only=True, many=True)
     class Meta:
         model = Company
+        fields = "__all__"
+
+class RequisiteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Requisite
         fields = "__all__"

@@ -12,6 +12,7 @@ router.register(r'company', CompanyViewSet)
 router.register(r'client', ClientViewSet)
 router.register(r'doc', DocsViewSet)
 router.register(r'contact', ContactViewSet)
+router.register(r'requisite', RequisiteViewSet)
 
 
 urlpatterns = router.urls

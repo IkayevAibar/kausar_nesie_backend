@@ -20,12 +20,12 @@ class Credit(models.Model):
     amount = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Сумма кредита", null=False,
                                  blank=False)
 
-    status = models.ForeignKey("catalog.Status", verbose_name="Идентификатор статусов", on_delete=models.CASCADE,
+    status = models.ForeignKey("catalog.Status", default=1, verbose_name="Идентификатор статусов", on_delete=models.CASCADE,
                                blank=False,
-                               null=False)
-    rule = models.ForeignKey("catalog.PaymentRule", verbose_name="Идентификатор правила платежа",
+                               null=False)#TODO: Убрать default правила платежа
+    rule = models.ForeignKey("catalog.PaymentRule", default=1, verbose_name="Идентификатор правила платежа",
                              on_delete=models.CASCADE, blank=False,
-                             null=False)
+                             null=False) #TODO: Убрать default правила платежа
     curr = models.ForeignKey('catalog.Currencies', verbose_name="Идентификатор валюты кредита",
                              on_delete=models.CASCADE,
                              blank=True, null=True)
@@ -34,14 +34,6 @@ class Credit(models.Model):
     date_begin = models.DateField(verbose_name="Дата начала", null=False, blank=False)
     date_end = models.DateField(verbose_name="Дата окончания", null=False, blank=False)
     date_close = models.DateField(verbose_name="Дата закрытия", null=True, blank=True)
-    to_cash = models.BooleanField(verbose_name="Реквизиты для выдачи. Через кассу",
-                                  null=False, default=False)
-    req_acc = models.CharField(max_length=35, verbose_name="Реквизиты для выдачи. Счет", blank=True, null=True)
-    req_bank = models.ForeignKey("catalog.Bank", verbose_name="Реквизиты для выдачи. Банк", on_delete=models.CASCADE,
-                                 blank=False,
-                                 null=False)
-    req_name = models.CharField(max_length=255, verbose_name="Реквизиты для выдачи. Клиент", blank=True, null=True)
-    req_kbe = models.CharField(max_length=2, verbose_name="Реквизиты для выдачи. КБе", blank=True, null=True)
     date_sign = models.DateField(verbose_name="Дата подписания договора", null=True, blank=True)
     depart = models.ForeignKey("catalog.Departament", verbose_name="Реквизиты для выдачи. Отдел",
                                on_delete=models.CASCADE,
@@ -62,21 +54,30 @@ class Credit(models.Model):
     is_line = models.BooleanField(verbose_name="Признак линии",
                                   null=True, default=True)
     period_type = models.ForeignKey("catalog.PeriodType", on_delete=models.SET_NULL, null=True, blank=True,
-                                    verbose_name="Срок договора - тип периода")
-    period_count = models.IntegerField(verbose_name="Идентификатор заявки",
-                                       blank=True, null=True)
+                                    verbose_name="Тип периода - Срок")
+    period_count = models.IntegerField(verbose_name="Срок", null=True, blank=True)
     reason = models.TextField(verbose_name="Основание выдачи кредита", null=True, blank=True)
-    effective_rate = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Эффективная ставка", null=False,
+    effective_rate = models.DecimalField(max_digits=16, default=0, decimal_places=2, verbose_name="Эффективная ставка", null=False,
                                          blank=False)
-    is_affiliated = models.BooleanField(verbose_name="is_affiliated",
+    is_affiliated = models.BooleanField(verbose_name="Аффилированное лицо",
                                         null=True, default=True)
-    is_rate_fixed = models.BooleanField(verbose_name="is_rate_fixed",
+    is_rate_fixed = models.BooleanField(verbose_name="Фиксировать курсовую разницу",
                                         null=True, default=True)
-    insurance_amt = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="insurance_amt", null=False,
+    insurance_amt = models.DecimalField( max_digits=16, decimal_places=2, verbose_name="Страховая премия", null=False,
                                         blank=False)
-    agency_cost = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="agency_cost", null=False,
+    agency_cost = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Агентская премия", null=False,
                                       blank=False)
 
+    coborrowers = models.ManyToManyField("clients.IndividualClient", verbose_name="Созаемщики", related_name="coborrowers", blank=True)
+    
     class Meta:
         verbose_name = "Кредит"
         verbose_name_plural = "Кредиты"
+
+class CreditTreatments(models.Model):
+    credit = models.ForeignKey(Credit, verbose_name="Кредит", on_delete=models.CASCADE, related_name='treatments')
+    document = models.FileField(upload_to='credit/docs/', verbose_name="Сканированная копия документа Договора Кредита", null=False, blank=False)
+
+    class Meta:
+        verbose_name = "Файл Договора Кредита"
+        verbose_name_plural = "Файлы Договора Кредита"

@@ -4,18 +4,6 @@ User = get_user_model()
 
 
 
-class Cities(models.Model):
-    """Справочник. Населенные пункты"""
-
-    name = models.CharField(max_length=255, verbose_name="Название", blank=True)
-
-    def __str__(self):
-        return f"{self.name}"
-
-    class Meta:
-        verbose_name = "Справочник. Населенный пункт"
-        verbose_name_plural = "Справочник. Населенные пункты"
-
 
 class AddressType(models.Model):
     """Справочник. Типы адресов"""
@@ -43,9 +31,23 @@ class Areas(models.Model):
         verbose_name = "Справочник. Область"
         verbose_name_plural = "Справочник. Области"
 
+class Cities(models.Model):
+    """Справочник. Населенные пункты"""
+
+    area = models.ForeignKey(Areas, on_delete=models.CASCADE, verbose_name="Область", blank=True, null=True)
+    name = models.CharField(max_length=255, verbose_name="Название", blank=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Справочник. Населенный пункт"
+        verbose_name_plural = "Справочник. Населенные пункты"
+
 class District(models.Model):
     """Справочник. Районы"""
 
+    city = models.ForeignKey(Cities, on_delete=models.CASCADE, verbose_name="Населенный пункт", blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name="Название", blank=True)
 
     def __str__(self):
@@ -59,6 +61,7 @@ class District(models.Model):
 class Street(models.Model):
     """Справочник. Улицы"""
 
+    district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name="Район", blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name="Название", blank=True)
 
     def __str__(self):
@@ -301,7 +304,7 @@ class Currencies(models.Model):
         (DBB, 'ДВВ'),
     )
 
-    name = models.CharField(max_length=15, verbose_name="Наименование", blank=True, null=False)
+    name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     alpha_code = models.CharField(max_length=3, verbose_name="Буквенный код валюты", blank=True, null=False)
     num_code = models.CharField(max_length=3, verbose_name="Цифровой код валюты", blank=True, null=False)
     curr_type = models.PositiveSmallIntegerField(

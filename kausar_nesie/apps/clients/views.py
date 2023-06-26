@@ -1,6 +1,11 @@
-from rest_framework import viewsets
+from django.db.models import Q
+
+from rest_framework import viewsets, status, filters
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import *
 from .models import *
@@ -37,14 +42,55 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__name', '=individual_client__name', \
+        'individual_client__name', '^individual_client__surname', '=individual_client__surname', 'individual_client__surname', \
+            '^individual_client__middle_name', '=individual_client__middle_name', 'individual_client__middle_name']
+    filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
+        'individual_client__client_category']
+
+    @action(detail=False, methods=['get'])
+    def search_individual_client(self, request):
+        query = request.GET.get('query')
+        if query:
+            clients = self.filter_queryset(self.get_queryset()).filter(
+                Q(individual_client__name__icontains=query) |
+                Q(individual_client__surname__icontains=query)
+            ).distinct()
+        else:
+            clients = self.filter_queryset(self.get_queryset())
+        
+        page = self.paginate_queryset(clients)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(clients, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def search_company_client(self, request):
+        query = request.GET.get('query')
+        if query:
+            clients = self.filter_queryset(self.get_queryset()).filter(
+                Q(company_owners__short_name__icontains=query) |
+                Q(company_owners__full_name__icontains=query)
+            ).distinct()
+        else:
+            clients = self.filter_queryset(self.get_queryset())
+        
+        page = self.paginate_queryset(clients)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(clients, many=True)
+        return Response(serializer.data)
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
             return ClientRetrieveSerializer
         return self.serializer_class
-
-
-
 
 class CompanyViewSet(viewsets.ModelViewSet):
     """Юр лица"""
@@ -83,3 +129,7 @@ class ContactViewSet(viewsets.ModelViewSet):
             return ContactRetrieveSerializer
         return self.serializer_class
 
+class RequisiteViewSet(viewsets.ModelViewSet):
+    queryset = Requisite.objects.all()
+    serializer_class = RequisiteSerializer
+    permission_classes = [AllowAny]

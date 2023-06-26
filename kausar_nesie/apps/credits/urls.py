@@ -6,5 +6,6 @@ app_name = "credits"
 router = DefaultRouter()
 
 router.register(r'credit', CreditViewSet)
+router.register(r'credit-treatments', CreditTreatmentViewSet)
 
 urlpatterns = router.urls

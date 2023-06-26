@@ -68,7 +68,6 @@ class Client(models.Model):
                             on_delete=models.SET_NULL, blank=True, null=True)
     insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)
     individual_client = models.OneToOneField(IndividualClient, on_delete=models.CASCADE, null=True, blank=True)
-    companies = models.ManyToManyField('Company', related_name='client_companies', blank=True, through=Company.owners.through)
     
     def __str__(self):
         if(self.individual_client):
@@ -105,8 +104,8 @@ class Address(models.Model):
     post_index = models.CharField(max_length=10, verbose_name="Почтовый индекс", null=True, blank=True)
     cities = models.ForeignKey('catalog.Cities', verbose_name="Город", null=True, blank=True, on_delete=models.CASCADE)
     areas = models.ForeignKey('catalog.Areas', verbose_name="Область", null=True, blank=True, on_delete=models.CASCADE)
-    district = models.CharField(max_length=255, verbose_name="Район города", blank=True, null=False)
-    street = models.CharField(max_length=255, verbose_name="Улица", blank=True, null=False)
+    district = models.ForeignKey('catalog.District', verbose_name="Район города", blank=True, null=False, on_delete=models.CASCADE)
+    street = models.ForeignKey('catalog.Street', verbose_name="Улица", blank=True, null=True, on_delete=models.CASCADE)
     house = models.CharField(max_length=255, verbose_name="Дом", blank=True, null=False)
     flat = models.CharField(max_length=255, verbose_name="Квартира", blank=True, null=True)
     addr_type = models.ForeignKey('catalog.AddressType', verbose_name="Тип адреса", on_delete=models.CASCADE,
@@ -154,7 +153,6 @@ class Account(models.Model):
         verbose_name = "Счет"
         verbose_name_plural = "Счета"
 
-
 class Contact(models.Model):
     """Контакты"""
 
@@ -168,6 +166,16 @@ class Contact(models.Model):
     class Meta:
         verbose_name = "Контакт"
         verbose_name_plural = "Контакты"
+
+class Requisite(models.Model):
+    """ Реквизиты """
+    client = models.ForeignKey("Client", verbose_name="Реквизиты физического лица", on_delete=models.CASCADE, related_name='requisites')
+    to_cash = models.BooleanField(verbose_name="Реквизиты для выдачи. Через кассу",null=False, default=False)
+    req_acc = models.CharField(max_length=35, verbose_name="Реквизиты для выдачи. Счет", blank=True, null=True)
+    req_bank = models.ForeignKey("catalog.Bank", verbose_name="Реквизиты для выдачи. Банк", on_delete=models.CASCADE,blank=False, null=False)
+    req_name = models.CharField(max_length=255, verbose_name="Реквизиты для выдачи. Клиент", blank=True, null=True)
+    req_kbe = models.CharField(max_length=2, verbose_name="Реквизиты для выдачи. КБе", blank=True, null=True)
+
 
 # class IdCard(models.Model):
 #     """Документы удостоверющие данные клиента"""

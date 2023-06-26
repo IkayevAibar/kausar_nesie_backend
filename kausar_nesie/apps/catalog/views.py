@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import *
 
@@ -24,6 +25,24 @@ class CitiesViewSet(viewsets.ModelViewSet):
     queryset = Cities.objects.all()
     serializer_class = CitiesSerializer
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['area']
+
+class DistrictViewSet(viewsets.ModelViewSet):
+    """Справочник. Районы"""
+    queryset = District.objects.all()
+    serializer_class = DistrictSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['city']
+
+class StreetViewSet(viewsets.ModelViewSet):
+    """Справочник. Улицы"""
+    queryset = Street.objects.all()
+    serializer_class = StreetSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['district']
 
 class ClientCategoryViewSet(viewsets.ModelViewSet):
     """Справочник. Категории клиентов"""

@@ -9,6 +9,13 @@ class AddressTypeSerializer(serializers.ModelSerializer):
         model = AddressType
         fields = "__all__"
 
+class AreasSerializer(serializers.ModelSerializer):
+    """Справочник. Области"""
+
+    class Meta:
+        model = Areas
+        fields = "__all__"
+
 
 class CitiesSerializer(serializers.ModelSerializer):
     """Справочник. Населенные пункты"""
@@ -18,13 +25,19 @@ class CitiesSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AreasSerializer(serializers.ModelSerializer):
-    """Справочник. Области"""
+class DistrictSerializer(serializers.ModelSerializer):
+    """Справочник. Районы"""
 
     class Meta:
-        model = Areas
+        model = District
         fields = "__all__"
 
+class StreetSerializer(serializers.ModelSerializer):
+    """Справочник. Улицы"""
+
+    class Meta:
+        model = Street
+        fields = "__all__"
 
 class ClientCategorySerializer(serializers.ModelSerializer):
     """Справочник. Категории клиентов"""

@@ -5,6 +5,8 @@ from .models import *
 admin.site.register(Cities)
 admin.site.register(AddressType)
 admin.site.register(Areas)
+admin.site.register(District)
+admin.site.register(Street)
 admin.site.register(ClientCategory)
 admin.site.register(CategoryType)
 admin.site.register(WorkType)
