@@ -17,5 +17,10 @@ __pycache__/
 
 credit_draw.py
 credit_draw_v2.py
+doc_generation.py
+doc_generation2.py
+
+template.docx
+test.docx
 
 .vscode

@@ -1,4 +1,5 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 
@@ -108,12 +109,17 @@ class ClientSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         individual_client_data = validated_data.pop('individual_client', None)
-        client = Client.objects.create(**validated_data)
 
         if individual_client_data:
-            individual_client = IndividualClient.objects.create(**individual_client_data)
-            client.individual_client = individual_client
-            client.save()
+            try:
+                individual_client = IndividualClient.objects.create(**individual_client_data)
+                validated_data['individual_client'] = individual_client
+            except Exception as e:
+                raise serializers.ValidationError({"error":"Данные для физ лица некорректны", "error_message": e})  
+        else:
+            raise serializers.ValidationError({"error":"Данные для физ лица не предоставлены"})
+
+        client = Client.objects.create(**validated_data)
 
         return client
 
