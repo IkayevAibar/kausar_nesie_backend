@@ -402,7 +402,7 @@ class CollateralType(models.Model):
     """Справочник. Типы залога"""
 
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
-    code = models.CharField(max_length=3, verbose_name="Код", blank=True, null=False)
+    code = models.CharField(max_length=4, verbose_name="Код", blank=True, null=False)
 
     def __str__(self):
         return f"{self.name} {self.code}"

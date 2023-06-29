@@ -1,9 +1,19 @@
 from .serializers import *
 from rest_framework import viewsets, permissions
+from django_filters.rest_framework import DjangoFilterBackend, IsoDateTimeFilter, DateFilter, LookupChoiceFilter
+from django_filters import FilterSet
+
+class CollateralFilter(FilterSet):
+
+    class Meta:
+        model = Collateral
+        fields = ['num_dog', 'client', 'type', 'status',]
 
 class CollateralViewSet(viewsets.ModelViewSet):
     queryset = Collateral.objects.all()
     serializer_class = CollateralSerializer
+    filterset_class = CollateralFilter
+    filter_backends = [DjangoFilterBackend,]
     
     def get_permissions(self):
         if self.action == 'create':
