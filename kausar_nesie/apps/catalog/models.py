@@ -466,7 +466,7 @@ class Calculate(models.Model):
                                                  )
 
     def __str__(self):
-        return f"{self.name} {self.bic}"
+        return f"{self.name}"
 
     class Meta:
         verbose_name = "Справочник. Тип расчета"
