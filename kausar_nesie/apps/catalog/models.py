@@ -351,8 +351,8 @@ class Country(models.Model):
     """Справочник. Государства"""
 
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
-    code = models.CharField(max_length=3, verbose_name="Код", blank=True, null=False)
-    alfa_3 = models.CharField(max_length=3, verbose_name="Код алфа - 3", blank=True, null=False)
+    code = models.CharField(max_length=3, verbose_name="Код", blank=True, null=True)
+    alfa_3 = models.CharField(max_length=3, verbose_name="Код алфа - 3", blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} {self.code}"
