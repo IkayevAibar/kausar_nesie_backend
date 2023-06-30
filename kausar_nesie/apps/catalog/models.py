@@ -368,7 +368,7 @@ class Counters(models.Model):
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
     value = models.IntegerField(verbose_name="Значение", blank=True, null=False)
-    max_value = models.IntegerField(verbose_name="максимальное значение", blank=True, null=False)
+    max_value = models.IntegerField(verbose_name="максимальное значение", blank=True, null=True)
     auto_reset = models.BooleanField(verbose_name="Автосброс при достижении максимального значения", \
                                      null=True, default=False)
     period_type = models.ForeignKey(PeriodType, on_delete=models.SET_NULL, null=True)
