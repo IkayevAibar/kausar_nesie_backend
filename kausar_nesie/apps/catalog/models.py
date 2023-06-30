@@ -421,7 +421,7 @@ class DeptType(models.Model):
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     code = models.CharField(max_length=50, verbose_name="Код", blank=True, null=False)
     category = models.CharField(max_length=1, choices=TYPE_CHOICES,
-                                verbose_name="Категория задолженности (S - системная)", blank=True, null=False)
+                                verbose_name="Категория задолженности (S - системная)", blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} {self.code}"
