@@ -322,8 +322,8 @@ class Currencies(models.Model):
 class CreditTarget(models.Model):
     """Справочник. Цели кредитования"""
 
-    name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
     code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
+    name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
 
     def __str__(self):
         return f"{self.name} {self.code}"
@@ -555,7 +555,7 @@ class AccountType(models.Model):
     acc_pattern = models.ForeignKey(AccountPattern, on_delete=models.SET_NULL, null=True, blank=True)
     open_type = models.CharField(max_length=5,
                                  verbose_name="Тип открытия (n - не открывать, o - открыть, od/oc/op - открыть на подразделение/клиента/продукт(договор)",
-                                 choices=OPEN_TYPE_CHOICES)
+                                 choices=OPEN_TYPE_CHOICES, null=True, blank=True)
     def_currency = models.PositiveSmallIntegerField(
         choices=CURRENCY_TYPE_CHOICES, null=True, blank=True, verbose_name=(
             "Настройка валюты для открытия (0 - не указано, 1- нац, 2 - валюта продукта, 3 - в указанной валютеы")
