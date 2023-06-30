@@ -435,7 +435,7 @@ class Bank(models.Model):
     """Справочник. Банки"""
 
     name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
-    bic = models.CharField(max_length=3, verbose_name="Код", blank=True, null=False)
+    bic = models.CharField(max_length=8, verbose_name="Код", blank=True, null=False)
 
     def __str__(self):
         return f"{self.name} {self.bic}"
