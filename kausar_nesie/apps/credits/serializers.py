@@ -13,7 +13,6 @@ class CreditSerializer(serializers.ModelSerializer):
     status = serializers.PrimaryKeyRelatedField(read_only=True)
     is_line = serializers.BooleanField(read_only=True)
     date_sign = serializers.DateField(read_only=True)
-    effective_rate = serializers.FloatField(read_only=True)
     class Meta:
         model = Credit
         fields = "__all__"

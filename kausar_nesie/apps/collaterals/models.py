@@ -47,9 +47,6 @@ class Collateral(models.Model):
     #                             on_delete=models.SET_NULL,
     #                             blank=True, null=True)
     # legal_docs = models.TextField(verbose_name="Правоустанавливающие документы", null=True, blank=True)
-    
-    
-
     # encumbrance = models.BooleanField(verbose_name="Признак обременения", blank=True, null=True)
     # comments = models.TextField(verbose_name="Комментарии к обременению", null=True, blank=True)
 

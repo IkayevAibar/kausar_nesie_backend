@@ -9,7 +9,7 @@ class AddressType(models.Model):
     """Справочник. Типы адресов"""
 
     name = models.CharField(max_length=255, verbose_name="Название", blank=True)
-    code = models.CharField(max_length=255, verbose_name="Населенный пункт", blank=True)
+    code = models.CharField(max_length=255, verbose_name="Код", blank=True)
 
     def __str__(self):
         return f"{self.name} {self.code}"

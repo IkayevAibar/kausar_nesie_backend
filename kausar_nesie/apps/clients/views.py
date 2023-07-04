@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -75,9 +75,9 @@ class ClientViewSet(viewsets.ModelViewSet):
             clients = self.filter_queryset(self.get_queryset()).filter(
                 Q(company_owners__short_name__icontains=query) |
                 Q(company_owners__full_name__icontains=query)
-            ).distinct()
+            ).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0).distinct()
         else:
-            clients = self.filter_queryset(self.get_queryset())
+            clients = self.filter_queryset(self.get_queryset()).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0)
         
         page = self.paginate_queryset(clients)
         if page is not None:
@@ -88,7 +88,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ['list', 'retrieve', 'search_company_client', 'search_individual_client']:
             return ClientRetrieveSerializer
         return self.serializer_class
 
