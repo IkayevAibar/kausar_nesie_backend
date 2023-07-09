@@ -23,7 +23,7 @@ class Credit(models.Model):
     status = models.ForeignKey("catalog.Status", default=1, verbose_name="Идентификатор статусов", on_delete=models.CASCADE,
                                blank=False,
                                null=False)#TODO: Убрать default правила платежа
-    rule = models.ForeignKey("catalog.PaymentRule", default=1, verbose_name="Идентификатор правила платежа",
+    rule = models.ForeignKey("catalog.PaymentRule", default=37828, verbose_name="Идентификатор правила платежа",
                              on_delete=models.CASCADE, blank=False,
                              null=False) #TODO: Убрать default правила платежа
     curr = models.ForeignKey('catalog.Currencies', verbose_name="Идентификатор валюты кредита",
