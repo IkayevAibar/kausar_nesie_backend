@@ -73,12 +73,12 @@ class CreditViewSet(viewsets.ModelViewSet):
         data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
         
         try:
-            document = Document('/apps/credits/utils/template.docx')
+            document = Document('apps/credits/utils/template.docx')
         except:
             try:
                 document = Document('kausar_nesie/apps/credits/utils/template.docx')
             except:
-                raise Response({"error_message":"Шаблон Документа не найден"},status=status.HTTP_404_NOT_FOUND)
+                return Response({"error_message":"Шаблон Документа не найден"},status=status.HTTP_404_NOT_FOUND)
 
         field_name_00 = "_director_full_name_"
         field_value_00 = "Директор Тестовик"
