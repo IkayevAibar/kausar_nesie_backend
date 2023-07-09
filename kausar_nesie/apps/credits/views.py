@@ -73,8 +73,9 @@ class CreditViewSet(viewsets.ModelViewSet):
         data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
         
         import os
+        return Response(os.getcwd())
         try:
-            document = Document('/kausar_nesie/apps/credits/utils/template.docx')
+            document = Document('/apps/credits/utils/template.docx')
         except:
             document = Document('kausar_nesie/apps/credits/utils/template.docx')
         
