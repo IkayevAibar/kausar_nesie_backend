@@ -20,7 +20,7 @@ class Credit(models.Model):
     amount = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Сумма кредита", null=False,
                                  blank=False)
 
-    status = models.ForeignKey("catalog.Status", default=1, verbose_name="Идентификатор статусов", on_delete=models.CASCADE,
+    status = models.ForeignKey("catalog.Status", verbose_name="Идентификатор статусов", on_delete=models.CASCADE,
                                blank=False,
                                null=False)#TODO: Убрать default правила платежа
     rule = models.ForeignKey("catalog.PaymentRule", default=37828, verbose_name="Идентификатор правила платежа",
