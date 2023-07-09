@@ -2,7 +2,9 @@ from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import locale
 
+locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
 load_dotenv()
 
@@ -114,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Asia/Almaty'
 
@@ -128,6 +130,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-
+from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action
 
@@ -7,6 +7,14 @@ from django_filters.rest_framework import DjangoFilterBackend, IsoDateTimeFilter
 from django_filters import FilterSet, DateTimeFromToRangeFilter
 from .serializers import *
 
+from docx import Document
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.shared import Pt
+import calendar
+from num2words import num2words
+
+from apps.clients.models import *
+from apps.collaterals.models import *
 class CreditFilter(FilterSet):
     num_dog = CharFilter()
     client__individual_client__rnn = CharFilter()
@@ -34,6 +42,221 @@ class CreditViewSet(viewsets.ModelViewSet):
             return CreditGetSerializer
         return self.serializer_class
     
+    def fill_field(self, paragraph, field_name, field_value):
+        if field_name in paragraph.text:
+            run = paragraph.runs[0]  # Получаем первый Run в параграфе
+            font_size = run.font.size  # Получаем размер шрифта
+            paragraph.text = paragraph.text.replace(field_name, field_value)
+            new_run = paragraph.runs[0]  # Получаем новый Run
+            new_run.font.size = font_size  # Устанавливаем размер шрифта
+            new_run.font.name = 'Times New Roman'  # Устанавливаем шрифт Times New Roman
+
+
+    @action(detail=True, methods=['get'])
+    def generate_credit_treatment(self, request, pk=None):
+        try:
+            credit = self.get_object()
+        except:
+            raise Response(status=status.HTTP_404_NOT_FOUND)
+
+        # try:
+        kausar_company = Company.objects.get(reg_num=123123123)
+        kausar_company_director = IndividualClient.objects.filter(reg_number="0001").first()
+        
+        percent_rate = float(credit.effective_rate)
+        loan_term = credit.period_count
+        loan_amount = float(credit.amount)
+        commission_rate = 2
+        days_in_first_payment = 30
+        days_in_last_payment = 30
+        monthly_commission_in = 0
+        data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
+        
+        document = Document('kausar_nesie/apps/credits/utils/template.docx')
+
+        field_name_00 = "_director_full_name_"
+        field_value_00 = "Директор Тестовик"
+
+        field_name_01 = "_credit_protocol_number_"
+        field_value_01 = credit.num_dog
+
+        field_name_02 = "_credit_day_number_"
+        field_value_02 = credit.date_begin.strftime("%d")
+        
+        date_begin_month_number = credit.date_begin.strftime("%m")
+        date_begin_month_name = calendar.month_name[int(date_begin_month_number)]
+        field_name_03 = "_credit_month_string_"
+        field_value_03 = date_begin_month_name
+
+        field_name_04 = "_credit_year_last_two_"
+        field_value_04 = credit.date_begin.strftime("%y")
+
+        field_name_05 = "_credit_year_last_one_"
+        field_value_05 = credit.date_begin.strftime("%y")[1]
+
+        field_name_06 = "_credit_amount_"
+        field_value_06 = str(credit.amount).rstrip("0").rstrip(".")
+
+        field_name_07 = "_credit_string_amount_"
+        field_value_07 = num2words(str(credit.amount).rstrip("0").rstrip("."), lang='ru')
+
+        field_name_08 = "_collateral_type_"
+        field_value_08 = "Автотранспорт"
+
+        field_name_09 = "_collateral_name_"
+        field_value_09 = "Toyota"
+
+        field_name_1 = "_credit_end_day_"
+        field_value_1 = credit.date_end.strftime("%d")
+
+        date_end_month_number = credit.date_end.strftime("%m")
+        date_end_month_name = calendar.month_name[int(date_end_month_number)]
+        field_name_2 = "_credit_end_month_string_"
+        field_value_2 = date_end_month_name
+
+        field_name_3 = "_credit_end_year_last_two_"
+        field_value_3 = credit.date_end.strftime("%y")
+
+        field_name_3_1 = "_credit_payment_persent_"
+        field_value_3_1 = str(credit.effective_rate).rstrip("0").rstrip(".")
+
+        field_name_4 = "_credit_payment_persent_string_"
+        field_value_4 = num2words(str(credit.effective_rate).rstrip("0").rstrip("."), lang='ru')
+
+        field_name_5 = "_credit_payment_method_"
+        field_value_5 = "Аннуитетный"
+
+        field_name_6 = "_credit_aim_"
+        field_value_6 = credit.credit_target.name
+
+        field_name_7 = "_year_effect_rate_persent_"
+        field_value_7 = str(data["gesv"])
+
+        field_name_8 = "_year_effect_rate_persent_string_"
+        field_value_8 = num2words(str(commission_rate).rstrip("0").rstrip("."), lang='ru')
+
+        field_name_9 = "_collateral_date_begin_day_"
+        field_value_9 = "28"
+
+        field_name_10 = "_collateral_date_begin_month_string_"
+        field_value_10 = "Июнь"
+
+        field_name_11 = "_collateral_date_begin_year_last_one_"
+        field_value_11 = "3"
+
+        field_name_12 = "_collateral_market_rated_company_"
+        field_value_12 = "Оценщик"
+
+        field_name_13 = "_collateral_reg_num_"
+        field_value_13 = "42332"
+
+        field_name_14 = "_collateral_num_dog_"
+        field_value_14 = "25"
+
+        field_name_15 = "_commission_rate_"
+        field_value_15 = "2"
+
+        field_name_16 = "_commission_string_rate_"
+        field_value_16 = "Два"
+
+        field_name_17 = "_bank_company_address_"
+        field_value_17 = "г. Алматы"
+
+        field_name_18 = "_bank_fact_address_"
+        field_value_18 = "г. Алматы"
+
+        field_name_19 = "_bank_iik_"
+        field_value_19 = "123123123123123"
+
+        field_name_20 = "_bank_kbe_"
+        field_value_20 = "125121221323112"
+
+        field_name_21 = "_country_"
+        field_value_21 = "Республика Казахстан"
+
+        field_name_22 = "_client_full_name_"
+        field_value_22 = f"{credit.client.individual_client.name} {credit.client.individual_client.surname} {credit.client.individual_client.middle_name}"
+
+        field_name_23 = "_passport_number_"
+        field_value_23 = "123123123123"
+
+        field_name_24 = "_passport_given_place_"
+        field_value_24 = "МВД"
+
+        field_name_25 = "_client_country_"
+        field_value_25 = credit.client.individual_client.country.name
+
+        field_name_26 = "_client_iin_"
+        field_value_26 = credit.client.individual_client.iin
+
+        field_name_27 = "_client_address_registered_"
+        field_value_27 = "г. Алматы, Пушкина, 15"
+
+        field_name_28 = "_client_address_actual_"
+        field_value_28 = "г. Алматы, Пушкина, 15"
+
+        field_name_29 = "_client_phone_private_"
+        field_value_29 = "+7 788 489 1234"
+
+        field_name_30 = "_client_phone_home_"
+        field_value_30 = "+7 7292 489123"
+
+
+
+        for paragraph in document.paragraphs:
+            self.fill_field(paragraph, field_name_00, field_value_00)
+            self.fill_field(paragraph, field_name_01, field_value_01)
+            self.fill_field(paragraph, field_name_02, field_value_02)
+            self.fill_field(paragraph, field_name_03, field_value_03)
+            self.fill_field(paragraph, field_name_04, field_value_04)
+            self.fill_field(paragraph, field_name_05, field_value_05)
+            self.fill_field(paragraph, field_name_06, field_value_06)
+            self.fill_field(paragraph, field_name_07, field_value_07)
+            self.fill_field(paragraph, field_name_08, field_value_08)
+            self.fill_field(paragraph, field_name_09, field_value_09)
+            self.fill_field(paragraph, field_name_1, field_value_1)
+            self.fill_field(paragraph, field_name_2, field_value_2)
+            self.fill_field(paragraph, field_name_3, field_value_3)
+            self.fill_field(paragraph, field_name_4, field_value_4)
+            self.fill_field(paragraph, field_name_3_1, field_value_3_1)
+            self.fill_field(paragraph, field_name_5, field_value_5)
+            self.fill_field(paragraph, field_name_6, field_value_6)
+            self.fill_field(paragraph, field_name_8, field_value_8)
+            self.fill_field(paragraph, field_name_7, field_value_7)
+            self.fill_field(paragraph, field_name_9, field_value_9)
+            self.fill_field(paragraph, field_name_10, field_value_10)
+            self.fill_field(paragraph, field_name_11, field_value_11)
+            self.fill_field(paragraph, field_name_12, field_value_12)
+            self.fill_field(paragraph, field_name_13, field_value_13)
+            self.fill_field(paragraph, field_name_14, field_value_14)
+            self.fill_field(paragraph, field_name_15, field_value_15)
+            self.fill_field(paragraph, field_name_16, field_value_16)
+            self.fill_field(paragraph, field_name_17, field_value_17)
+            self.fill_field(paragraph, field_name_18, field_value_18)
+            self.fill_field(paragraph, field_name_19, field_value_19)
+            self.fill_field(paragraph, field_name_20, field_value_20)
+            self.fill_field(paragraph, field_name_21, field_value_21)
+            self.fill_field(paragraph, field_name_22, field_value_22)
+            self.fill_field(paragraph, field_name_23, field_value_23)
+            self.fill_field(paragraph, field_name_24, field_value_24)
+            self.fill_field(paragraph, field_name_25, field_value_25)
+            self.fill_field(paragraph, field_name_26, field_value_26)
+            self.fill_field(paragraph, field_name_27, field_value_27)
+            self.fill_field(paragraph, field_name_28, field_value_28)
+            self.fill_field(paragraph, field_name_29, field_value_29)
+            self.fill_field(paragraph, field_name_30, field_value_30)
+
+        path = f'/credit/contracts/{field_value_01}_credit_contract.docx'
+        document.save(f'kausar_nesie/media{path}')
+        ct = CreditTreatments.objects.get_or_create(credit=credit, name=f'{field_value_01}_credit_contract.docx' , document=path)
+        if(ct[0] == False):
+            index = 1
+        else:
+            index = 0
+
+        url = request.build_absolute_uri(ct[index].document.url)
+        return Response({'status': 'ok', 'url': url}, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['get'])
     def get_graphic_of_payment(self, request, pk=None):
         try:

@@ -76,6 +76,7 @@ class Credit(models.Model):
 
 class CreditTreatments(models.Model):
     credit = models.ForeignKey(Credit, verbose_name="Кредит", on_delete=models.CASCADE, related_name='treatments')
+    name = models.CharField(max_length=255, verbose_name="Наименование", null=False, blank=False)
     document = models.FileField(upload_to='credit/docs/', verbose_name="Сканированная копия документа Договора Кредита", null=False, blank=False)
 
     class Meta:
