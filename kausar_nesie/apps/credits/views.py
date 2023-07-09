@@ -253,7 +253,15 @@ class CreditViewSet(viewsets.ModelViewSet):
             self.fill_field(paragraph, field_name_30, field_value_30)
 
         path = f'/credit/contracts/{field_value_01}_credit_contract.docx'
-        document.save(f'kausar_nesie/media{path}')
+
+        try:
+            document.save(f'kausar_nesie/media{path}')
+        except:
+            try:
+                document.save(f'media{path}')
+            except:
+                return Response({"error_message":"Не удалось сохранить договор"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
         ct = CreditTreatments.objects.get_or_create(credit=credit, name=f'{field_value_01}_credit_contract.docx' , document=path)
         if(ct[0] == False):
             index = 1
