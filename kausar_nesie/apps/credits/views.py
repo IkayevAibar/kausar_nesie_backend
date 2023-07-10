@@ -164,7 +164,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             return Response({"error_message":"У клиента нет залога"},status=status.HTTP_404_NOT_FOUND)
         
         field_name_08 = "_collateral_type_"
-        field_value_08 = collateral.type
+        field_value_08 = collateral.type.name
 
         field_name_09 = "_collateral_name_"
         field_value_09 = collateral.name

@@ -37,7 +37,7 @@ class Collateral(models.Model):
                                     blank=True, null=True)
     emp = models.ForeignKey(User, verbose_name="Ответственный сотрудник",
                             on_delete=models.SET_NULL, blank=True, null=True)
-    date_close = models.DateField(verbose_name="Дата подписания", null=True, blank=True)
+    date_close = models.DateField(verbose_name="Дата закрытия", null=True, blank=True)
     
     name = models.CharField(max_length=255 ,null=True, blank=True, verbose_name="Наименование залоговой ценности")
     # market_value = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Рыночная стоимость")
