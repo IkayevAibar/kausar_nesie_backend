@@ -63,22 +63,36 @@ class CreditViewSet(viewsets.ModelViewSet):
         kausar_company = Company.objects.get(reg_num=123123123)
         kausar_company_director = IndividualClient.objects.filter(reg_number="0001").first()
         
-        percent_rate = float(credit.effective_rate)
-        loan_term = credit.period_count
-        loan_amount = float(credit.amount)
-        commission_rate = 2
-        days_in_first_payment = 30
-        days_in_last_payment = 30
-        monthly_commission_in = 0
-        data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
-        
+        try:
+            percent_rate = float(credit.effective_rate)
+            loan_term = credit.period_count
+            loan_amount = float(credit.amount)
+            commission_rate = 2
+            days_in_first_payment = 30
+            days_in_last_payment = 30
+            monthly_commission_in = 0
+            data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
+        except:
+            return Response({"error_message":"Ошибка при расчете платежей"},status=status.HTTP_404_NOT_FOUND)        
         credit_client = credit.client
-        client_docs = Docs.objects.filter(client=credit_client, identity_card_type=1).last()
-        client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
-        client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
-        client_contact_home = Contact.objects.filter(client=credit_client, contact_type=1).last()
-        client_contact_phone = Contact.objects.filter(client=credit_client, contact_type=2).last()
-
+        
+        try:
+            client_docs = Docs.objects.filter(client=credit_client, identity_card_type=1).last()
+        except:
+            return Response({"error_message":"У клиента нет документа удостоверяющего личность"},status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
+            client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
+        except:
+            return Response({"error_message":"У клиента нет адресов"},status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            client_contact_home = Contact.objects.filter(client=credit_client, contact_type=1).last()
+            client_contact_phone = Contact.objects.filter(client=credit_client, contact_type=2).last()
+        except:
+            return Response({"error_message":"У клиента нет контактов"},status=status.HTTP_404_NOT_FOUND)
+        
         try:
             document = Document('apps/credits/utils/template.docx')
         except:
@@ -88,7 +102,7 @@ class CreditViewSet(viewsets.ModelViewSet):
                 return Response({"error_message":"Шаблон Документа не найден"},status=status.HTTP_404_NOT_FOUND)
 
         field_name_00 = "_director_full_name_"
-        field_value_00 = "Директор Тестовик"
+        field_value_00 = "Директор Каусар Компани"
 
         field_name_01 = "_credit_protocol_number_"
         field_value_01 = credit.num_dog
@@ -98,6 +112,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         
         date_begin_month_number = credit.date_begin.strftime("%m")
         date_begin_month_name = calendar.month_name[int(date_begin_month_number)]
+
         field_name_03 = "_credit_month_string_"
         field_value_03 = date_begin_month_name.capitalize()
 
@@ -113,17 +128,12 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_name_07 = "_credit_string_amount_"
         field_value_07 = num2words(str(credit.amount).rstrip("0").rstrip("."), lang='ru')
 
-        field_name_08 = "_collateral_type_"
-        field_value_08 = "Автотранспорт"
-
-        field_name_09 = "_collateral_name_"
-        field_value_09 = "Toyota"
-
         field_name_1 = "_credit_end_day_"
         field_value_1 = credit.date_end.strftime("%d")
 
         date_end_month_number = credit.date_end.strftime("%m")
         date_end_month_name = calendar.month_name[int(date_end_month_number)]
+
         field_name_2 = "_credit_end_month_string_"
         field_value_2 = date_end_month_name.capitalize()
 
@@ -148,23 +158,37 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_name_8 = "_year_effect_rate_persent_string_"
         field_value_8 = num2words(str(commission_rate).rstrip("0").rstrip("."), lang='ru')
 
+        try:
+            collateral = Collateral.objects.filter(client=credit.client).last()
+        except:
+            return Response({"error_message":"У клиента нет залога"},status=status.HTTP_404_NOT_FOUND)
+        
+        field_name_08 = "_collateral_type_"
+        field_value_08 = collateral.type
+
+        field_name_09 = "_collateral_name_"
+        field_value_09 = collateral.name
+
         field_name_9 = "_collateral_date_begin_day_"
-        field_value_9 = "28"
+        field_value_9 = collateral.date_begin.strftime("%d")
+
+        collateral_date_begin_month_number = collateral.date_begin.strftime("%m")
+        collateral_date_begin_month_name = calendar.month_name[int(date_begin_month_number)]
 
         field_name_10 = "_collateral_date_begin_month_string_"
-        field_value_10 = "Июнь"
+        field_value_10 = collateral_date_begin_month_name.capitalize()
 
         field_name_11 = "_collateral_date_begin_year_last_one_"
-        field_value_11 = "3"
+        field_value_11 = collateral.date_begin.strftime("%y")[1]
 
         field_name_12 = "_collateral_market_rated_company_"
-        field_value_12 = "Оценщик"
+        field_value_12 = "___________"
 
         field_name_13 = "_collateral_reg_num_"
-        field_value_13 = "42332"
+        field_value_13 = collateral.num_dog
 
         field_name_14 = "_collateral_num_dog_"
-        field_value_14 = "25"
+        field_value_14 = collateral.num_dog
 
         field_name_15 = "_commission_rate_"
         field_value_15 = "2"
@@ -203,10 +227,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_26 = credit.client.individual_client.iin
 
         field_name_27 = "_client_address_registered_"
-        field_value_27 = f"{client_address_reg.areas.name}, {client_address_reg.cities.name}, {client_address_reg.street.name}, {client_address_reg.district.name}, {client_address_reg.house}, {client_address_reg.flat}"
+        field_value_27 = f"{client_address_reg.areas.name}, {client_address_reg.cities.name}, {client_address_reg.street.name}, {client_address_reg.district.name}, Дом {client_address_reg.house}, Квартира {client_address_reg.flat}"
 
         field_name_28 = "_client_address_actual_"
-        field_value_28 = f"{client_address_fact.areas.name}, {client_address_fact.cities.name}, {client_address_fact.street.name}, {client_address_fact.district.name}, {client_address_fact.house}, {client_address_fact.flat}"
+        field_value_28 = f"{client_address_fact.areas.name}, {client_address_fact.cities.name}, {client_address_fact.street.name}, {client_address_fact.district.name}, Дом {client_address_fact.house}, Квартира {client_address_fact.flat}"
 
         field_name_29 = "_client_phone_private_"
         field_value_29 = f"{client_contact_phone.value}"
