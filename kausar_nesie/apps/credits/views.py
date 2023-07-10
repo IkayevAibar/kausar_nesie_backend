@@ -72,6 +72,13 @@ class CreditViewSet(viewsets.ModelViewSet):
         monthly_commission_in = 0
         data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
         
+        credit_client = credit.client
+        client_docs = Docs.objects.filter(client=credit_client, identity_card_type=1).last()
+        client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
+        client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
+        client_contact_home = Contact.objects.filter(client=credit_client, contact_type=1).last()
+        client_contact_phone = Contact.objects.filter(client=credit_client, contact_type=2).last()
+
         try:
             document = Document('apps/credits/utils/template.docx')
         except:
@@ -92,7 +99,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         date_begin_month_number = credit.date_begin.strftime("%m")
         date_begin_month_name = calendar.month_name[int(date_begin_month_number)]
         field_name_03 = "_credit_month_string_"
-        field_value_03 = date_begin_month_name
+        field_value_03 = date_begin_month_name.capitalize()
 
         field_name_04 = "_credit_year_last_two_"
         field_value_04 = credit.date_begin.strftime("%y")
@@ -118,7 +125,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         date_end_month_number = credit.date_end.strftime("%m")
         date_end_month_name = calendar.month_name[int(date_end_month_number)]
         field_name_2 = "_credit_end_month_string_"
-        field_value_2 = date_end_month_name
+        field_value_2 = date_end_month_name.capitalize()
 
         field_name_3 = "_credit_end_year_last_two_"
         field_value_3 = credit.date_end.strftime("%y")
@@ -184,10 +191,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_22 = f"{credit.client.individual_client.name} {credit.client.individual_client.surname} {credit.client.individual_client.middle_name}"
 
         field_name_23 = "_passport_number_"
-        field_value_23 = "123123123123"
+        field_value_23 = f"{client_docs.number}"
 
         field_name_24 = "_passport_given_place_"
-        field_value_24 = "МВД"
+        field_value_24 = f"{client_docs.issued_by}"
 
         field_name_25 = "_client_country_"
         field_value_25 = credit.client.individual_client.country.name
@@ -196,16 +203,16 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_26 = credit.client.individual_client.iin
 
         field_name_27 = "_client_address_registered_"
-        field_value_27 = "г. Алматы, Пушкина, 15"
+        field_value_27 = f"{client_address_reg.areas.name}, {client_address_reg.city.name}, {client_address_reg.street.name}, {client_address_reg.district.name}, {client_address_reg.house}, {client_address_reg.flat}"
 
         field_name_28 = "_client_address_actual_"
-        field_value_28 = "г. Алматы, Пушкина, 15"
+        field_value_28 = f"{client_address_fact.areas.name}, {client_address_fact.city.name}, {client_address_fact.street.name}, {client_address_fact.district.name}, {client_address_fact.house}, {client_address_fact.flat}"
 
         field_name_29 = "_client_phone_private_"
-        field_value_29 = "+7 788 489 1234"
+        field_value_29 = f"{client_contact_phone.value}"
 
         field_name_30 = "_client_phone_home_"
-        field_value_30 = "+7 7292 489123"
+        field_value_30 = f"{client_contact_home.value}"
 
 
 
