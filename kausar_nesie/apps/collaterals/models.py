@@ -39,7 +39,7 @@ class Collateral(models.Model):
                             on_delete=models.SET_NULL, blank=True, null=True)
     date_close = models.DateField(verbose_name="Дата подписания", null=True, blank=True)
     
-    name = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Наименование залоговой ценности")
+    name = models.CharField(max_length=255 ,null=True, blank=True, verbose_name="Наименование залоговой ценности")
     # market_value = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Рыночная стоимость")
     # market_date = models.DateField(verbose_name="Дата оценки рыночной стоимости", null=True, blank=True)
     # market_currency = models.PositiveIntegerField(null=True, blank=True, verbose_name="market_currency")
