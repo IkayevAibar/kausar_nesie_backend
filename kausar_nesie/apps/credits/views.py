@@ -203,10 +203,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_26 = credit.client.individual_client.iin
 
         field_name_27 = "_client_address_registered_"
-        field_value_27 = f"{client_address_reg.areas.name}, {client_address_reg.city.name}, {client_address_reg.street.name}, {client_address_reg.district.name}, {client_address_reg.house}, {client_address_reg.flat}"
+        field_value_27 = f"{client_address_reg.areas.name}, {client_address_reg.cities.name}, {client_address_reg.street.name}, {client_address_reg.district.name}, {client_address_reg.house}, {client_address_reg.flat}"
 
         field_name_28 = "_client_address_actual_"
-        field_value_28 = f"{client_address_fact.areas.name}, {client_address_fact.city.name}, {client_address_fact.street.name}, {client_address_fact.district.name}, {client_address_fact.house}, {client_address_fact.flat}"
+        field_value_28 = f"{client_address_fact.areas.name}, {client_address_fact.cities.name}, {client_address_fact.street.name}, {client_address_fact.district.name}, {client_address_fact.house}, {client_address_fact.flat}"
 
         field_name_29 = "_client_phone_private_"
         field_value_29 = f"{client_contact_phone.value}"
