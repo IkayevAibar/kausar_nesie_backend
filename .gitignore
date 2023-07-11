@@ -15,11 +15,6 @@ __pycache__/
 *.log
 *.pot
 
-credit_draw.py
-credit_draw_v2.py
-doc_generation.py
-doc_generation2.py
-
-test.docx
+test_folder
 
 .vscode

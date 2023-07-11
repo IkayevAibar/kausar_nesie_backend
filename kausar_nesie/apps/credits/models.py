@@ -82,3 +82,26 @@ class CreditTreatments(models.Model):
     class Meta:
         verbose_name = "Файл Договора Кредита"
         verbose_name_plural = "Файлы Договора Кредита"
+
+
+class CreditPaymentSchedule(models.Model):
+    """График платежей"""
+    credit = models.ForeignKey(Credit, verbose_name="Кредит", on_delete=models.CASCADE, related_name='payments')
+    number = models.IntegerField(verbose_name="Номер платежа", null=False, blank=False)
+    date_to_payment = models.DateField(verbose_name="Дата для платежа", null=False, blank=False)
+    date_get_payment = models.DateField(verbose_name="Дата платежа", null=True, blank=False)
+    amount = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Сумма платежа", null=False,
+                                 blank=False)
+    principal_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Погашение основного долга")
+    commission_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Погашение комиссии")
+    total_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Общая сумма платежа")
+    principal_remaining = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Остаток основного долга")
+    monthly_commission = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Ежемесячная комиссия")
+    # status = models.ForeignKey("catalog.PaymentStatus", verbose_name="Статус платежа", on_delete=models.CASCADE,
+    #                            blank=False,
+    #                            null=False)
+
+    class Meta:
+        verbose_name = "График платежей"
+        verbose_name_plural = "Графики платежей"
+        unique_together = ('credit', 'number')

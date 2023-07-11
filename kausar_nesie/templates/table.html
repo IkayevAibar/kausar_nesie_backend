@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <title>Payment Schedule</title>
+        <style>
+            table {
+            width: 100%;
+            border-collapse: collapse;
+            }
+        
+            th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            }
+        
+            th {
+            background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <table>
+            <thead>
+              <tr>
+                <th>Номер платежа</th>
+                <th>Дата для платежа</th>
+                <th>Дата платежа</th>
+                <th>Сумма платежа</th>
+                <th>Погашение основного долга</th>
+                <th>Погашение комиссии</th>
+                <th>Общая сумма платежа</th>
+                <th>Остаток основного долга</th>
+                <th>Ежемесячная комиссия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in data %}
+                <tr>
+                  <td>{{ payment.number }}</td>
+                  <td>{{ payment.date_to_payment }}</td>
+                  <td>{{ payment.date_get_payment|default:"Не оплачен"}}</td>
+                  <td>{{ payment.amount }}</td>
+                  <td>{{ payment.principal_payment }}</td>
+                  <td>{{ payment.commission_payment }}</td>
+                  <td>{{ payment.total_payment }}</td>
+                  <td>{{ payment.principal_remaining }}</td>
+                  <td>{{ payment.monthly_commission }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </body>
+</html>

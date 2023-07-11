@@ -1,20 +1,25 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
+from django.shortcuts import render
+
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action
 
 from django_filters.rest_framework import DjangoFilterBackend, IsoDateTimeFilter, DateFilter, LookupChoiceFilter, CharFilter
 from django_filters import FilterSet, DateTimeFromToRangeFilter
-from .serializers import *
 
 from docx import Document
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.shared import Pt
-import calendar
 from num2words import num2words
+import calendar
+import datetime
 
 from apps.clients.models import *
 from apps.collaterals.models import *
+from .serializers import *
+
+
 class CreditFilter(FilterSet):
     num_dog = CharFilter()
     client__individual_client__rnn = CharFilter()
@@ -71,7 +76,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             days_in_first_payment = 30
             days_in_last_payment = 30
             monthly_commission_in = 0
-            data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
+            data = self.calculate_payment(credit, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in, False)
         except:
             return Response({"error_message":"Ошибка при расчете платежей"},status=status.HTTP_404_NOT_FOUND)        
         credit_client = credit.client
@@ -317,11 +322,20 @@ class CreditViewSet(viewsets.ModelViewSet):
         days_in_last_payment = 30
         monthly_commission_in = 0
 
-        data = self.calculate_payment(percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in)
+        data = self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=True)
         
-        return JsonResponse(data)
+        return Response({"message": "График платежей успешно создан"})
 
-    def calculate_payment(self, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in):
+    @staticmethod
+    def add_months(self, sourcedate, months):
+        month = sourcedate.month - 1 + months
+        year = sourcedate.year + month // 12
+        month = month % 12 + 1
+        day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+        return datetime.date(year, month, day)
+    
+    @staticmethod
+    def calculate_payment(self, credit, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in, with_creation=True):
         # Расчетные данные
         
         #Ежемесячный платеж
@@ -357,7 +371,24 @@ class CreditViewSet(viewsets.ModelViewSet):
             "principal_remaining": principal_remaining,
             "monthly_commission": 0.0
         })
-
+        # Создаем новый объект PaymentSchedule и заполняем его значениями из таблицы
+        if(with_creation == True):
+            try:
+                payment_schedule = CreditPaymentSchedule.objects.create(
+                    credit=credit,
+                    number=0,  
+                    date_to_payment=credit.date_begin,  # Замените на нужное поле из таблицы, указывающее на месяц
+                    date_get_payment=None,  # Замените на нужное поле из таблицы, указывающее на месяц
+                    amount=0,  # Замените на нужное поле из таблицы, указывающее на сумму платежа
+                    principal_payment=0,  # Замените на нужное поле из таблицы, указывающее на сумму погашения основного долга
+                    commission_payment=0,  # Замените на нужное значение
+                    total_payment=0,  # Замените на нужное значение
+                    principal_remaining=principal_remaining,  # Замените на нужное значение
+                    monthly_commission=0.0,  # Замените на нужное значение
+                    # status=Status.objects.get(name="Unpaid"),
+                )
+            except:
+                pass
         for month in range(1, loan_term + 1):
             if month <= loan_term:
                 monthly_commission = round(loan_amount * monthly_commission_in, 0)
@@ -383,7 +414,26 @@ class CreditViewSet(viewsets.ModelViewSet):
             sum_of_principal_remaining+=principal_remaining
             # Высчитываем Сумма ежемес. ком.
             sum_of_monthly_commission+=monthly_commission
-
+            
+            date_to_payment = self.add_months(self, credit.date_begin, month)
+            if(with_creation == True):
+                # Создаем новый объект PaymentSchedule и заполняем его значениями из таблицы
+                try:
+                    payment_schedule = CreditPaymentSchedule.objects.create(
+                        credit=credit,
+                        number=month,  
+                        date_to_payment=date_to_payment,  # Замените на нужное поле из таблицы, указывающее на месяц
+                        date_get_payment=None,  # Замените на нужное поле из таблицы, указывающее на месяц
+                        amount=0,  # Замените на нужное поле из таблицы, указывающее на сумму платежа
+                        principal_payment=principal_payment,  # Замените на нужное поле из таблицы, указывающее на сумму погашения основного долга
+                        commission_payment=commission_payment,  # Замените на нужное значение
+                        total_payment=total_payment,  # Замените на нужное значение
+                        principal_remaining=principal_remaining,  # Замените на нужное значение
+                        monthly_commission=monthly_commission,  # Замените на нужное значение
+                        # status=Status.objects.get(name="Unpaid"),
+                    )
+                except:
+                    pass
             result["table"].append({
                 "number": month,
                 "principal_payment": principal_payment,
@@ -403,3 +453,33 @@ class CreditTreatmentViewSet(viewsets.ModelViewSet):
     queryset = CreditTreatments.objects.all()
     serializer_class = CreditTreatmentsSerializer
     permission_classes = [permissions.AllowAny]
+
+class CreditPaymentScheduleFilter(FilterSet):
+    class Meta:
+        model = CreditPaymentSchedule
+        fields = ['credit',]
+
+class CreditPaymentScheduleViewSet(viewsets.ModelViewSet):
+    queryset = CreditPaymentSchedule.objects.all()
+    serializer_class = CreditPaymentScheduleSerializer
+    permission_classes = [permissions.AllowAny]
+    filterset_class = CreditPaymentScheduleFilter
+    filter_backends = [DjangoFilterBackend,]
+    pagination_class = None
+
+    @action(detail=False, methods=['get'])
+    def table(self, request):
+        credit_id = request.query_params.get('credit_id')
+        queryset = self.queryset.filter(credit=credit_id)
+        serializer_class = self.serializer_class(queryset, many=True)
+        
+        return render(
+            request,
+            'table.html',
+            {
+                'data':serializer_class.data,
+            }
+        )
+    
+
+    
