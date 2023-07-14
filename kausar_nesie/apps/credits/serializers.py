@@ -41,3 +41,10 @@ class CreditPaymentScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditPaymentSchedule
         fields = "__all__"
+
+class CreditLineSerializer(serializers.ModelSerializer):
+    """CreditLine Create/Update"""
+    credits = CreditSerializer(many=True, read_only=True)
+    class Meta:
+        model = CreditLine
+        fields = "__all__"

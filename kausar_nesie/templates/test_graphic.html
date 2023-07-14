@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <title>Payment Schedule</title>
+        <style>
+            table {
+            width: 100%;
+            border-collapse: collapse;
+            }
+        
+            th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            }
+        
+            th {
+            background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Данные по кредиту</h1>
+        ГЭСВ: {{data.gesv}}
+        <br >
+        Сумма%: {{data.sum_income}}
+        <br >
+        Сумма ком.: {{data.commission_amount}}
+        <br >
+        Сумма ост.ОД: {{data.sum_of_principal_remaining}}
+        <br >
+        Комиссия%: {{data.commission_rate}}
+        <br >
+        Доход: {{data.total_income}}
+        <br >
+        Ежемес.ком.: {{data.monthly_commission_in}}
+        <br >
+        Сумма ежемес.ком.: {{data.sum_of_monthly_commission}}
+        <h1>График платежей</h1>
+        <table>
+            <thead>
+              <tr>
+                <th>Номер платежа</th>
+                <th>Погашение основного долга</th>
+                <th>Погашение комиссии</th>
+                <th>Общая сумма платежа</th>
+                <th>Остаток основного долга</th>
+                <th>Ежемесячная комиссия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in data.table %}
+                <tr>
+                  <td>{{ payment.number }}</td>
+                  <td>{{ payment.principal_payment }}</td>
+                  <td>{{ payment.commission_payment }}</td>
+                  <td>{{ payment.total_payment }}</td>
+                  <td>{{ payment.principal_remaining }}</td>
+                  <td>{{ payment.monthly_commission }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </body>
+</html>

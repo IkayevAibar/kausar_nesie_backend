@@ -3,6 +3,30 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class CreditLine(models.Model):
+    num_dog = models.CharField(max_length=20, verbose_name="Номер договора", blank=True, null=True)
+    client = models.ForeignKey("clients.Client", verbose_name="Идентификатор заемщика", on_delete=models.CASCADE,
+                               blank=False,
+                               null=False)
+    amount = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Сумма кредита", null=False,
+                                 blank=False)
+    credit_type = models.ForeignKey("catalog.CreditType", verbose_name="Идентификатор типов кредитов",
+                                    on_delete=models.CASCADE, blank=False,
+                                    null=False)
+    project_type = models.ForeignKey("catalog.ProjectType", verbose_name="Тип проекта",
+                                     on_delete=models.CASCADE,
+                                     blank=True, null=True)
+    credit_target = models.ForeignKey("catalog.CreditTarget", verbose_name="Цель кредитования",
+                                      on_delete=models.CASCADE,
+                                      blank=True, null=True)
+    period_type = models.ForeignKey("catalog.PeriodType", on_delete=models.SET_NULL, null=True, blank=True,
+                                    verbose_name="Тип периода - Срок")
+    period_count = models.IntegerField(verbose_name="Срок", null=True, blank=True)
+    date_begin = models.DateField(verbose_name="Дата начала", null=False, blank=False)
+    date_end = models.DateField(verbose_name="Дата окончания", null=False, blank=False)
+    date_close = models.DateField(verbose_name="Дата закрытия", null=True, blank=True)
+
+    credits = models.ManyToManyField("credits.Credit", verbose_name="Кредиты", blank=True)
 
 class Credit(models.Model):
     """Кредиты"""

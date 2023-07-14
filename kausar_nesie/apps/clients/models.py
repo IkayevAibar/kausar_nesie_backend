@@ -134,7 +134,7 @@ class Account(models.Model):
     amount = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Остаток на счете", null=False,
                                  blank=False)
     acc_num = models.CharField(max_length=255, verbose_name="Номер счета", blank=True, null=False)
-    base_account = models.ForeignKey('catalog.BaseAccount', verbose_name="Идентификатор валюты",
+    base_account = models.ForeignKey('catalog.BaseAccount', verbose_name="Идентификатор базового счета",
                                      on_delete=models.CASCADE,
                                      blank=False, null=False, default=1)
     date_open = models.DateField(verbose_name="Дата открытия счета", null=True, blank=True)
@@ -144,7 +144,7 @@ class Account(models.Model):
     departament = models.ForeignKey('catalog.Departament', verbose_name="Идентификатор департамента",
                                     on_delete=models.CASCADE,
                                     blank=True, null=True)
-    client_r = models.ForeignKey(Client, verbose_name="client_r", on_delete=models.CASCADE,
+    client_r = models.ForeignKey(Client, verbose_name="Доверенный клиент", on_delete=models.CASCADE,
                                  blank=True, null=True, related_name='client_r')
     amount_nat = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Остаток в нац.покрытии", null=False,
                                      blank=False)

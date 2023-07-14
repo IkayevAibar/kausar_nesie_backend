@@ -1,5 +1,6 @@
 from django.http import JsonResponse, HttpRequest
 from django.shortcuts import render
+from django.db.models import Sum
 
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status, filters
@@ -307,6 +308,36 @@ class CreditViewSet(viewsets.ModelViewSet):
         url = request.build_absolute_uri(ct[index].document.url)
         return Response({'status': 'ok', 'url': url}, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'])
+    def test_graphic_of_payment(self, request):
+        
+        if(request.query_params.get('loan_term') == None):
+            return Response({"error_message": "Не указан срок кредита"})
+        if(request.query_params.get('loan_amount') == None):
+            return Response({"error_message": "Не указана сумма кредита"})
+        if(request.query_params.get('persent_rate') == None):
+            return Response({"error_message": "Не указана процентная ставка"})
+        
+        percent_rate = float(request.query_params.get('persent_rate'))
+        loan_term = int(request.query_params.get('loan_term'))
+        loan_amount = float(request.query_params.get('loan_amount'))
+        commission_rate = 2
+        days_in_first_payment = 30
+        days_in_last_payment = 30
+        monthly_commission_in = 0
+
+        data = self.calculate_payment(self=self, credit=None, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=False)
+        
+        return render(
+            request,
+            'test_graphic.html',
+            {
+                'data':data,
+            }
+        )
+        # return Response({"message": "График платежей успешно создан"})
+        return JsonResponse(data, safe=False)
+
     @action(detail=True, methods=['get'])
     def get_graphic_of_payment(self, request, pk=None):
         try:
@@ -324,7 +355,39 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         data = self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=True)
         
-        return Response({"message": "График платежей успешно создан"})
+        # return Response({"message": "График платежей успешно создан"})
+        return JsonResponse(data, safe=False)
+
+    def update_payment_schedule(self, credit_id, new_first_payment_amount):
+        credit = Credit.objects.get(id=credit_id)
+        
+        # Получите текущие значения для расчета платежного графика
+        percent_rate = credit.percent_rate
+        new_loan_term = new_first_payment_amount/(credit.loan_amount/credit.loan_term)
+        loan_term = credit.loan_term
+        new_loan_amount = loan_amount - new_first_payment_amount
+        loan_amount = credit.loan_amount
+        commission_rate = credit.commission_rate
+        days_in_first_payment = credit.days_in_first_payment
+        monthly_commission_in = credit.monthly_commission_in
+        
+        
+        # Пересчитайте график оплаты
+        result = self.calculate_payment(credit, percent_rate, new_loan_term, new_loan_amount, commission_rate,
+                                days_in_first_payment, monthly_commission_in, with_creation=False)
+        
+        # Обновите объекты PaymentSchedule с новыми значениями
+        for index, payment_data in enumerate(result["table"]):
+            payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=index)
+            payment_schedule.principal_payment = payment_data["principal_payment"]
+            payment_schedule.commission_payment = payment_data["commission_payment"]
+            payment_schedule.total_payment = payment_data["total_payment"]
+            payment_schedule.principal_remaining = payment_data["principal_remaining"]
+            payment_schedule.monthly_commission = payment_data["monthly_commission"]
+            payment_schedule.save()
+        
+        # Верните обновленный платежный график
+        return result["table"]
 
     @staticmethod
     def add_months(self, sourcedate, months):
@@ -374,7 +437,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         # Создаем новый объект PaymentSchedule и заполняем его значениями из таблицы
         if(with_creation == True):
             try:
-                payment_schedule = CreditPaymentSchedule.objects.create(
+                payment_schedule = CreditPaymentSchedule.objects.get_or_create(
                     credit=credit,
                     number=0,  
                     date_to_payment=credit.date_begin,  # Замените на нужное поле из таблицы, указывающее на месяц
@@ -415,8 +478,9 @@ class CreditViewSet(viewsets.ModelViewSet):
             # Высчитываем Сумма ежемес. ком.
             sum_of_monthly_commission+=monthly_commission
             
-            date_to_payment = self.add_months(self, credit.date_begin, month)
             if(with_creation == True):
+                date_to_payment = self.add_months(self, credit.date_begin, month)
+
                 # Создаем новый объект PaymentSchedule и заполняем его значениями из таблицы
                 try:
                     payment_schedule = CreditPaymentSchedule.objects.create(
@@ -482,4 +546,38 @@ class CreditPaymentScheduleViewSet(viewsets.ModelViewSet):
         )
     
 
-    
+class CreditLineViewSet(viewsets.ModelViewSet):
+    queryset = CreditLine.objects.all()
+    serializer_class = CreditLineSerializer
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=True, methods=['post'])
+    def add_credit(self, request, pk=None):
+        credit_line = CreditLine.objects.get(id=pk)
+        credits = credit_line.credits.all()
+
+        try:
+            credit = Credit.objects.get(id=request.data['credit_id'])
+        except:
+            return Response({"error_message":"Не удалось найти кредит"},status=status.HTTP_400_BAD_REQUEST)
+        
+        if credit.client != credit_line.client:
+            return Response({"error_message":"Клиент не совпадает с клиентом кредитной линии"},status=status.HTTP_400_BAD_REQUEST)
+
+        if credit_line.amount < credit.amount:
+            return Response({"error_message":"Сумма кредит превосходить допустимую сумму кредитной линии "},status=status.HTTP_400_BAD_REQUEST)
+        
+        if credit.is_line == False:
+            return Response({"error_message":"Кредит не имеет признаки кредитной линией"},status=status.HTTP_400_BAD_REQUEST)
+        
+        if credit in credits:
+            return Response({"error_message":"Кредит уже находитсяв этой кредитной линии"},status=status.HTTP_400_BAD_REQUEST)
+        
+        if credits.count() > 0:
+            total_amount = credits.aggregate(total_amount=Sum('amount'))['total_amount']
+            if total_amount + credit.amount > credit_line.amount:
+                return Response({"error_message":"Сумма кредит превосходить допустимую сумму кредитной линии "},status=status.HTTP_400_BAD_REQUEST)
+
+        credit_line.credits.add(credit)
+        
+        return Response(status=status.HTTP_202_ACCEPTED)
