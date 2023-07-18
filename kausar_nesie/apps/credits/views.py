@@ -26,10 +26,6 @@ class CreditFilter(FilterSet):
     client__individual_client__rnn = CharFilter()
     client__individual_client__iin = CharFilter()
     client = CharFilter()
-    # period_count = CharFilter()
-    # reason = CharFilter()
-    # client__individual_client__name = CharFilter()
-    # client__individual_client__surname = CharFilter()
     class Meta:
         model = Credit
         fields = ['num_dog', 'client__individual_client__rnn','client__individual_client__iin', 'status', 'client', 'credit_type']
@@ -48,6 +44,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             return CreditGetSerializer
         return self.serializer_class
     
+    @staticmethod
     def fill_field(self, paragraph, field_name, field_value):
         if field_name in paragraph.text:
             run = paragraph.runs[0]  # Получаем первый Run в параграфе
@@ -339,11 +336,11 @@ class CreditViewSet(viewsets.ModelViewSet):
         return JsonResponse(data, safe=False)
 
     @action(detail=True, methods=['get'])
-    def get_graphic_of_payment(self, request, pk=None):
+    def generate_graphic_of_payment(self, request, pk=None):
         try:
             credit = Credit.objects.get(id=pk)
         except:
-            raise Exception("Кредит не найден")
+            return Response({"message": "Кредит не найден"})
         
         percent_rate = float(credit.effective_rate)
         loan_term = credit.period_count
@@ -355,39 +352,238 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         data = self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=True)
         
-        # return Response({"message": "График платежей успешно создан"})
-        return JsonResponse(data, safe=False)
+        return Response({"message": "График платежей успешно создан"})
+        # return JsonResponse(data, safe=False)
 
-    def update_payment_schedule(self, credit_id, new_first_payment_amount):
-        credit = Credit.objects.get(id=credit_id)
+    @action(detail=True, methods=['get'])
+    def reset_graphic_of_payment(self, request, pk=None):
+        try:
+            credit = Credit.objects.get(id=pk)
+        except:
+            return Response({"message": "Кредит не найден"})
         
-        # Получите текущие значения для расчета платежного графика
-        percent_rate = credit.percent_rate
-        new_loan_term = new_first_payment_amount/(credit.loan_amount/credit.loan_term)
-        loan_term = credit.loan_term
-        new_loan_amount = loan_amount - new_first_payment_amount
-        loan_amount = credit.loan_amount
-        commission_rate = credit.commission_rate
-        days_in_first_payment = credit.days_in_first_payment
-        monthly_commission_in = credit.monthly_commission_in
+        percent_rate = float(credit.effective_rate)
+        loan_amount = float(credit.amount)
+        commission_rate = 2
+        days_in_first_payment = 30
+        days_in_last_payment = 30
+        monthly_commission_in = 0
+
+        try:
+            self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=credit.period_count, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=True, reset=True)
+        except:
+            return Response({"message": "Не удалось обнулить график платежей"})
         
+        return Response({"message": "График платежей успешно обнулен"})
+    
+    @action(detail=True, methods=['get'])
+    def regenerate_payment_schedule_by_lowing_month_count(self, request, pk=None):
+            
+            if(request.query_params.get('payment_amount') == None):
+                return Response({"error_message": "Не указана сумма досрочного платежа"})
+            if(request.query_params.get('payment_number') == None):
+                return Response({"error_message": "Не указан номер платежа"})
+            if(request.query_params.get('new_month_number') == None):
+                return Response({"error_message": "Не указан новый срок кредита"})
+
+            number = int(request.query_params.get('payment_number'))
+            payment_amount = float(request.query_params.get('payment_amount'))
+            new_month_number = int(request.query_params.get('new_month_number'))
+
+            credit = Credit.objects.get(id=pk)
+            cps = CreditPaymentSchedule.objects.get(credit=credit, number=number)
+            days_in_first_payment = 30
+
+            # if(cps.total_payment == payment_amount):
+            #     return Response({"error_message": "Сумма досрочного платежа не изменилась"})
+            
+            if(cps.total_payment > payment_amount):
+                return Response({"error_message": "Сумма досрочного платежа больше суммы платежа"})
+            
+            if(cps.total_payment*3 <= payment_amount):
+                if(number>1):
+                    prev_cps = CreditPaymentSchedule.objects.get(credit=credit, number=number-1)
+
+                    if number < credit.period_count:
+                        new_principal_payment= round(payment_amount - (float(prev_cps.principal_remaining)*float(credit.effective_rate)/100/12),0)
+                    else:
+                        if number == credit.period_coun:
+                            new_principal_payment = round(prev_cps.principal_remaining,0)
+                        else:
+                            new_principal_payment = 0
+                    # Высчитываем Погашение возн.
+                    cps.amount = payment_amount
+                    new_commission_payment  = round((new_principal_payment*float(credit.effective_rate)/100/12)/30*days_in_first_payment,0)
+                    cps.commission_payment = new_commission_payment
+                    cps.principal_payment = new_principal_payment
+                    cps.total_payment = payment_amount
+                    cps.principal_remaining = float(prev_cps.principal_remaining) - new_principal_payment
+                    # print(payment_amount, new_principal_payment, new_commission_payment, float(prev_cps.principal_remaining) - new_principal_payment)
+                    cps.save()
+
+                    try:
+                        cps_list = CreditPaymentSchedule.objects.filter(credit=credit, number__gte=number+1)
+                        cps_list.delete()
+                    except:
+                        pass
+
+                    loan_term = new_month_number + cps.number
+                    loan_amount = cps.principal_remaining
+                    principal_remaining = cps.principal_remaining
+                    monthly_commission_in = 0
+                    percent_rate = float(credit.effective_rate)
+                    monthly_payment = round(loan_amount * ((percent_rate*0.01/12)/(1-(1+percent_rate*0.01/12)**-(loan_term-cps.number))),0)
+                    
+                    for month in range(cps.number + 1, loan_term + 1):
+                        print(month)
+                        if month <= loan_term:
+                            monthly_commission = round(loan_amount * monthly_commission_in, 0)
+                        else:
+                            monthly_commission = 0
+                        # Высчитываем Погашение ОД
+                        if month < loan_term:
+                            principal_payment= round(monthly_payment - (principal_remaining*percent_rate/100/12),0)
+                        else:
+                            if month == loan_term:
+                                principal_payment = round(principal_remaining,0)
+                            else:
+                                principal_payment = 0
+                        # Высчитываем Погашение возн.
+                        commission_payment  = round((principal_remaining*percent_rate/100/12)/30*days_in_first_payment,0)
+                        
+                        # Высчитываем Общая сумма ОД+%+ком
+                        total_payment = principal_payment + commission_payment + monthly_commission
+                        # Высчитываем Остаток ОД
+                        principal_remaining -= principal_payment
+                        
+                        
+                        date_to_payment = self.add_months(self, credit.date_begin, month)
+
+                        # Создаем новый объект PaymentSchedule и заполняем его значениями из таблицы
+                        # try:
+                        payment_schedule = CreditPaymentSchedule.objects.create(
+                            credit=credit,
+                            number=month,  
+                            date_to_payment=date_to_payment,  # Замените на нужное поле из таблицы, указывающее на месяц
+                            date_get_payment=None,  # Замените на нужное поле из таблицы, указывающее на месяц
+                            amount=0,  # Замените на нужное поле из таблицы, указывающее на сумму платежа
+                            principal_payment=principal_payment,  # Замените на нужное поле из таблицы, указывающее на сумму погашения основного долга
+                            commission_payment=commission_payment,  # Замените на нужное значение
+                            total_payment=total_payment,  # Замените на нужное значение
+                            principal_remaining=principal_remaining,  # Замените на нужное значение
+                            monthly_commission=monthly_commission,  # Замените на нужное значение
+                            status=PaymentStatus.objects.get(id=1),
+                            penalty_commission=0,
+                        )
+                        payment_schedule.save()
+                        # except:
+                        #     pass
+                        
+                    
+
+            return Response({"message": "График платежей успешно обновлен"})
+
+    @action(detail=True, methods=['get'])
+    def regenerate_payment_schedule_by_lowing_month_price(self, request, pk=None):
+
+        if(request.query_params.get('payment_amount') == None):
+            return Response({"error_message": "Не указана сумма досрочного платежа"})
+        if(request.query_params.get('payment_number') == None):
+            return Response({"error_message": "Не указан номер платежа"})
+    
+        try:
+            self.update_payment_schedule(self=self, payment_amount=request.query_params.get('payment_amount'), payment_number=request.query_params.get('payment_number'), pk=pk)
+        except:
+            return Response({"error_message": "Не удалось обновить график платежей"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        # Пересчитайте график оплаты
-        result = self.calculate_payment(credit, percent_rate, new_loan_term, new_loan_amount, commission_rate,
-                                days_in_first_payment, monthly_commission_in, with_creation=False)
+        return Response({"message": "График платежей успешно обновлен"})
+    
+    @staticmethod
+    def update_payment_schedule(self, payment_amount, payment_number, pk=None):
+        credit = Credit.objects.get(id=pk)
+        new_first_payment_amount = payment_amount
+        number = payment_number
+
+        if(new_first_payment_amount == None):
+            return Response({"error_message": "Не указана сумма досрочного платежа"})
         
-        # Обновите объекты PaymentSchedule с новыми значениями
-        for index, payment_data in enumerate(result["table"]):
-            payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=index)
-            payment_schedule.principal_payment = payment_data["principal_payment"]
-            payment_schedule.commission_payment = payment_data["commission_payment"]
-            payment_schedule.total_payment = payment_data["total_payment"]
-            payment_schedule.principal_remaining = payment_data["principal_remaining"]
-            payment_schedule.monthly_commission = payment_data["monthly_commission"]
-            payment_schedule.save()
+        if(number == None):
+            return Response({"error_message": "Не указан номер платежа"})
+
+        cps = CreditPaymentSchedule.objects.get(credit=credit, number=number)
+
+        if(int(number)>1):
+            cps2 = CreditPaymentSchedule.objects.get(credit=credit, number=int(number)-1)
+            prev_principal_remaining = float(cps2.principal_remaining)
         
-        # Верните обновленный платежный график
-        return result["table"]
+        if int(number) < credit.period_count:
+            new_principal_payment= round(float(payment_amount) - (float(cps2.principal_remaining)*float(credit.effective_rate)/100/12),0)
+        else:
+            if number == credit.period_coun:
+                new_principal_payment = round(cps2.principal_remaining,0)
+            else:
+                new_principal_payment = 0
+        
+        cps.amount = new_first_payment_amount
+        cp  = round((float(new_principal_payment)*float(credit.effective_rate)/100/12)/30*30,0)
+        cps.commission_payment = cp
+        pp = float(new_first_payment_amount) - cp
+        cps.principal_payment= pp
+        cps.total_payment = float(new_first_payment_amount)
+        cps.principal_remaining = prev_principal_remaining - pp
+        cps.save()
+
+        cpss = CreditPaymentSchedule.objects.filter(credit=credit, number__gte=int(number)+1).order_by('number')
+        
+        temp_principal_remaining = prev_principal_remaining - pp
+        days_in_first_payment = 30
+        monthly_commission_in = 0
+        percent_rate = float(credit.effective_rate)
+        loan_term = credit.period_count - int(number)
+        monthly_payment = round(temp_principal_remaining * ((percent_rate*0.01/12)/(1-(1+percent_rate*0.01/12)**-loan_term)),0)
+        principal_remaining = temp_principal_remaining
+        commission_payment = 0
+        sum_income = 0
+        sum_of_principal_remaining = 0
+        sum_of_monthly_commission = 0
+        for item in cpss:
+            if item.number <= loan_term + int(number):
+                monthly_commission = round(credit.amount * monthly_commission_in, 0)
+            else:
+                monthly_commission = 0
+            # Высчитываем Погашение ОД
+            if item.number < loan_term + int(number):
+                principal_payment= round(monthly_payment - (principal_remaining*percent_rate/100/12),0)
+            else:
+                if item.number == loan_term:
+                    principal_payment = round(principal_remaining,0)
+                else:
+                    principal_payment = 0
+            commission_payment  = round((principal_remaining*percent_rate/100/12)/30*days_in_first_payment,0)
+            # Высчитываем Сумма %
+            sum_income+=commission_payment
+            # Высчитываем Остаток ОД
+            principal_remaining -= principal_payment
+            # Высчитываем Сумма ост. ОД
+            sum_of_principal_remaining+=principal_remaining
+            # Высчитываем Сумма ежемес. ком.
+            sum_of_monthly_commission+=monthly_commission
+
+            print(item.number, principal_payment, commission_payment, principal_remaining, monthly_commission)
+            item.principal_payment = principal_payment
+            item.commission_payment = commission_payment
+            item.total_payment = principal_payment + commission_payment
+            item.principal_remaining = principal_remaining
+            item.monthly_commission = monthly_commission
+            item.save()
+
+        return Response({
+            "number": number,
+            "new_first_payment_amount": new_first_payment_amount,
+            "commission_payment": cp,
+            "monthly_payment": monthly_payment,
+            "temp_principal_remaining": temp_principal_remaining
+        })
 
     @staticmethod
     def add_months(self, sourcedate, months):
@@ -398,7 +594,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         return datetime.date(year, month, day)
     
     @staticmethod
-    def calculate_payment(self, credit, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in, with_creation=True):
+    def calculate_payment(self, credit, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in, with_creation=True, reset=False):
         # Расчетные данные
         
         #Ежемесячный платеж
@@ -448,10 +644,14 @@ class CreditViewSet(viewsets.ModelViewSet):
                     total_payment=0,  # Замените на нужное значение
                     principal_remaining=principal_remaining,  # Замените на нужное значение
                     monthly_commission=0.0,  # Замените на нужное значение
+                    status=PaymentStatus.objects.get(id=1),
+                    penalty_commission=0,
                     # status=Status.objects.get(name="Unpaid"),
                 )
+                payment_schedule.save()
             except:
                 pass
+        
         for month in range(1, loan_term + 1):
             if month <= loan_term:
                 monthly_commission = round(loan_amount * monthly_commission_in, 0)
@@ -483,7 +683,7 @@ class CreditViewSet(viewsets.ModelViewSet):
 
                 # Создаем новый объект PaymentSchedule и заполняем его значениями из таблицы
                 try:
-                    payment_schedule = CreditPaymentSchedule.objects.create(
+                    payment_schedule = CreditPaymentSchedule.objects.get_or_create(
                         credit=credit,
                         number=month,  
                         date_to_payment=date_to_payment,  # Замените на нужное поле из таблицы, указывающее на месяц
@@ -494,10 +694,31 @@ class CreditViewSet(viewsets.ModelViewSet):
                         total_payment=total_payment,  # Замените на нужное значение
                         principal_remaining=principal_remaining,  # Замените на нужное значение
                         monthly_commission=monthly_commission,  # Замените на нужное значение
+                        status=PaymentStatus.objects.get(id=1),
+                        penalty_commission=0,
                         # status=Status.objects.get(name="Unpaid"),
                     )
+                    payment_schedule.save()
                 except:
                     pass
+            if(reset==True):
+                try:
+                    payment_schedule = CreditPaymentSchedule.objects.get(
+                        credit=credit,
+                        number=month,
+                    )
+
+                    payment_schedule.amount = 0
+                    payment_schedule.principal_payment = principal_payment
+                    payment_schedule.commission_payment = commission_payment
+                    payment_schedule.total_payment = total_payment
+                    payment_schedule.principal_remaining = principal_remaining
+                    payment_schedule.monthly_commission = monthly_commission
+                    payment_schedule.status = PaymentStatus.objects.get(id=1)
+                    payment_schedule.penalty_commission = 0
+                    payment_schedule.save()
+                except:
+                    pass 
             result["table"].append({
                 "number": month,
                 "principal_payment": principal_payment,
@@ -512,6 +733,60 @@ class CreditViewSet(viewsets.ModelViewSet):
         result["sum_income"] = sum_income
         result["sum_of_principal_remaining"] = sum_of_principal_remaining
         return result
+    
+    @action(detail=True, methods=['get'])
+    def payment(self, request, pk=None):
+        credit = self.get_object()
+        payment_amount = request.query_params.get('payment_amount')
+        payment_number = request.query_params.get('payment_number')
+        
+        if(payment_amount == None):
+            return Response({"error": "payment_amount is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if(payment_number == None):
+            return Response({"error": "payment_number is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        payment_amount = float(payment_amount)
+        
+        try:
+            credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number)
+        except:
+            return Response({"error": "payment_number is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if(credit_payment_schedule.status.id == 2):
+            return Response({"error": "payment_number is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        credit_payment_schedule.amount = payment_amount
+
+        if(payment_amount < credit_payment_schedule.total_payment):
+            credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
+            credit_payment_schedule.save()
+
+            next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number+1)
+            next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - payment_amount
+            next_credit_payment_schedule.save()
+
+            
+        #150000 50000
+        if(payment_amount > credit_payment_schedule.total_payment):
+            if(credit_payment_schedule.total_payment*3<payment_amount):
+                return Response({"error": "payment_amount превосходит 3-х месячную оплату"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number+1)
+            # next_credit_payment_schedule.amount = payment_amount - next_credit_payment_schedule.total_payment
+            # next_credit_payment_schedule.save()
+            
+            credit_payment_schedule.status = PaymentStatus.objects.get(id=4)
+            credit_payment_schedule.save()
+
+            # self.update_payment_schedule(self, payment_amount, payment_number, credit.id)
+            
+
+        if(payment_amount == credit_payment_schedule.total_payment):
+            credit_payment_schedule.status = PaymentStatus.objects.get(id=2)
+            credit_payment_schedule.save()
+        
+        return Response({"success": "payment is success"}, status=status.HTTP_200_OK)
 
 class CreditTreatmentViewSet(viewsets.ModelViewSet):
     queryset = CreditTreatments.objects.all()
@@ -534,7 +809,7 @@ class CreditPaymentScheduleViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def table(self, request):
         credit_id = request.query_params.get('credit_id')
-        queryset = self.queryset.filter(credit=credit_id)
+        queryset = self.queryset.filter(credit=credit_id).order_by('id')
         serializer_class = self.serializer_class(queryset, many=True)
         
         return render(

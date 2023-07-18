@@ -23,13 +23,14 @@
             <thead>
               <tr>
                 <th>Номер платежа</th>
-                <th>Дата для платежа</th>
-                <th>Дата платежа</th>
+                <th>Статус платежа</th>
                 <th>Сумма платежа</th>
                 <th>Погашение основного долга</th>
                 <th>Погашение комиссии</th>
                 <th>Общая сумма платежа</th>
                 <th>Остаток основного долга</th>
+                <th>Дата для платежа</th>
+                <th>Дата платежа</th>
                 <th>Ежемесячная комиссия</th>
               </tr>
             </thead>
@@ -37,13 +38,23 @@
               {% for payment in data %}
                 <tr>
                   <td>{{ payment.number }}</td>
-                  <td>{{ payment.date_to_payment }}</td>
-                  <td>{{ payment.date_get_payment|default:"Не оплачен"}}</td>
+                  {% if payment.status == 1 %}
+                    <td>Не оплачен</td>
+                  {% elif payment.status == 2 %}
+                    <td>Оплачен</td>
+                  {% elif payment.status == 3 %}
+                    <td>Оплачен с недоплатой</td>
+                  {% elif payment.status == 4 %}
+                    <td>Оплачен с переплатой</td>
+                  {% endif %}
+                  <!-- <td>{{ payment.status }}</td> -->
                   <td>{{ payment.amount }}</td>
                   <td>{{ payment.principal_payment }}</td>
                   <td>{{ payment.commission_payment }}</td>
                   <td>{{ payment.total_payment }}</td>
                   <td>{{ payment.principal_remaining }}</td>
+                  <td>{{ payment.date_to_payment }}</td>
+                  <td>{{ payment.date_get_payment|default:"Не оплачен"}}</td>
                   <td>{{ payment.monthly_commission }}</td>
                 </tr>
               {% endfor %}

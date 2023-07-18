@@ -152,6 +152,19 @@ class Status(models.Model):
         verbose_name = "Справочник. Статус"
         verbose_name_plural = "Справочник. Статусы"
 
+class PaymentStatus(models.Model):
+    """Справочник. Статусы"""
+
+    name = models.CharField(max_length=255, verbose_name="Наименование статуса", blank=True, null=False)
+    code = models.CharField(max_length=255, verbose_name="Код статуса", blank=True, null=False)
+
+    def __str__(self):
+        return f"{self.name} {self.code}"
+
+    class Meta:
+        verbose_name = "Справочник. Статус оплаты кредита"
+        verbose_name_plural = "Справочник. Статусы оплаты кредита"
+
 
 class SectorEcon(models.Model):
     """Справочник. Сектора экономики"""

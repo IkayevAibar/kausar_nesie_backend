@@ -91,7 +91,7 @@ class Credit(models.Model):
                                         blank=False)
     agency_cost = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Агентская премия", null=False,
                                       blank=False)
-
+    last_payment_number = models.IntegerField(verbose_name="Номер последнего платежа", null=True, blank=True, default=0)
     coborrowers = models.ManyToManyField("clients.IndividualClient", verbose_name="Созаемщики", related_name="coborrowers", blank=True)
     
     class Meta:
@@ -121,9 +121,13 @@ class CreditPaymentSchedule(models.Model):
     total_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Общая сумма платежа")
     principal_remaining = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Остаток основного долга")
     monthly_commission = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Ежемесячная комиссия")
-    # status = models.ForeignKey("catalog.PaymentStatus", verbose_name="Статус платежа", on_delete=models.CASCADE,
-    #                            blank=False,
-    #                            null=False)
+    penalty_commission = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Пеня")
+    status = models.ForeignKey("catalog.PaymentStatus", verbose_name="Статус платежа", on_delete=models.CASCADE,
+                               blank=False,
+                               null=False)
+
+    def __str__(self):
+        return f"{self.credit} - {self.number}"
 
     class Meta:
         verbose_name = "График платежей"
