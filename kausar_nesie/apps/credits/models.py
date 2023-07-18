@@ -124,7 +124,7 @@ class CreditPaymentSchedule(models.Model):
     penalty_commission = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Пеня")
     status = models.ForeignKey("catalog.PaymentStatus", verbose_name="Статус платежа", on_delete=models.CASCADE,
                                blank=False,
-                               null=False)
+                               null=True)
 
     def __str__(self):
         return f"{self.credit} - {self.number}"
