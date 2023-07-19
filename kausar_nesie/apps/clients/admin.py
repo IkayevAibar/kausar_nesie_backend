@@ -44,6 +44,11 @@ class ContactAdmin(admin.ModelAdmin):
     list_filter = ('contact_type', )
     search_fields = ('value', )
 
+class RequisiteAdmin(admin.ModelAdmin):
+    list_display = ('client', 'req_acc', 'req_bank', 'req_name', 'req_kbe')
+    list_filter = ('req_bank', 'to_cash')
+    search_fields = ('req_name', 'req_kbe', 'req_acc')
+
 admin.site.register(IndividualClient, IndividualClientAdmin)
 admin.site.register(Docs, DocsAdmin)
 admin.site.register(Company, CompanyAdmin)
@@ -51,5 +56,6 @@ admin.site.register(Address, AddressAdmin)
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Client, ClientAdmin)
 admin.site.register(Contact, ContactAdmin)
+admin.site.register(Requisite, RequisiteAdmin)
 
 

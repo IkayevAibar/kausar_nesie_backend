@@ -116,6 +116,7 @@ class CreditPaymentSchedule(models.Model):
     date_get_payment = models.DateField(verbose_name="Дата платежа", null=True, blank=False)
     amount = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Сумма платежа", null=False,
                                  blank=False)
+    not_paid_amount = models.DecimalField(max_digits=16, default=0, decimal_places=2, verbose_name="Сумма неоплаченного платежа"),
     principal_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Погашение основного долга")
     commission_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Погашение комиссии")
     total_payment = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Общая сумма платежа")
