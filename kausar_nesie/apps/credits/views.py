@@ -327,7 +327,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         days_in_first_payment = temp
         days_in_last_payment = 30
         monthly_commission_in = mci
-        if(request.query_params.get('loan_amount')=='1'):
+        if(request.query_params.get('credit_payment_type')=='1'):
             credit_payment_type = 1
         else:
             credit_payment_type = 2
