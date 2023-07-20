@@ -240,7 +240,7 @@ class CreditViewSet(viewsets.ModelViewSet):
 
 
         for paragraph in document.paragraphs:
-            self.fill_field(paragraph, field_name_00, field_value_00)
+            # self.fill_field(paragraph, field_name_00, field_value_00)
             self.fill_field(paragraph, field_name_01, field_value_01)
             self.fill_field(paragraph, field_name_02, field_value_02)
             self.fill_field(paragraph, field_name_03, field_value_03)
