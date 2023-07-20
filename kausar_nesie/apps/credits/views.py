@@ -63,37 +63,35 @@ class CreditViewSet(viewsets.ModelViewSet):
             raise Response(status=status.HTTP_404_NOT_FOUND)
 
         # try:
-        kausar_company = Company.objects.get(reg_num=123123123)
-        kausar_company_director = IndividualClient.objects.filter(reg_number="0001").first()
+        # kausar_company = Company.objects.get(reg_num=123123123)
+        # kausar_company_director = IndividualClient.objects.filter(reg_number="0001").first()
         
         try:
             percent_rate = float(credit.effective_rate)
-            loan_term = credit.period_count
+            loan_term = int(credit.period_count)
             loan_amount = float(credit.amount)
             commission_rate = 2
             days_in_first_payment = 30
             days_in_last_payment = 30
             monthly_commission_in = 0
-            data = self.calculate_payment(credit, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, monthly_commission_in, False)
+            data = self.calculate_payment(self= self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=False, reset=False)
         except:
             return Response({"error_message":"Ошибка при расчете платежей"},status=status.HTTP_404_NOT_FOUND)        
+        
         credit_client = credit.client
         
-        try:
-            client_docs = Docs.objects.filter(client=credit_client, identity_card_type=1).last()
-        except:
+        client_docs = Docs.objects.filter(client=credit_client, identity_card_type=1).last()
+        if(client_docs == None):
             return Response({"error_message":"У клиента нет документа удостоверяющего личность"},status=status.HTTP_404_NOT_FOUND)
         
-        try:
-            client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
-            client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
-        except:
+        client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
+        client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
+        if(client_address_fact == None or client_address_reg == None):
             return Response({"error_message":"У клиента нет адресов"},status=status.HTTP_404_NOT_FOUND)
         
-        try:
-            client_contact_home = Contact.objects.filter(client=credit_client, contact_type=1).last()
-            client_contact_phone = Contact.objects.filter(client=credit_client, contact_type=2).last()
-        except:
+        client_contact_home = Contact.objects.filter(client=credit_client, contact_type=1).last()
+        client_contact_phone = Contact.objects.filter(client=credit_client, contact_type=2).last()
+        if(client_contact_home == None or client_contact_phone == None):
             return Response({"error_message":"У клиента нет контактов"},status=status.HTTP_404_NOT_FOUND)
         
         try:
@@ -167,31 +165,36 @@ class CreditViewSet(viewsets.ModelViewSet):
             return Response({"error_message":"У клиента нет залога"},status=status.HTTP_404_NOT_FOUND)
         
         field_name_08 = "_collateral_type_"
-        field_value_08 = collateral.type.name
-
         field_name_09 = "_collateral_name_"
-        field_value_09 = collateral.name
-
         field_name_9 = "_collateral_date_begin_day_"
-        field_value_9 = collateral.date_begin.strftime("%d")
-
-        collateral_date_begin_month_number = collateral.date_begin.strftime("%m")
-        collateral_date_begin_month_name = calendar.month_name[int(date_begin_month_number)]
-
         field_name_10 = "_collateral_date_begin_month_string_"
-        field_value_10 = collateral_date_begin_month_name.capitalize()
-
         field_name_11 = "_collateral_date_begin_year_last_one_"
-        field_value_11 = collateral.date_begin.strftime("%y")[1]
-
         field_name_12 = "_collateral_market_rated_company_"
-        field_value_12 = "___________"
-
         field_name_13 = "_collateral_reg_num_"
-        field_value_13 = collateral.num_dog
-
         field_name_14 = "_collateral_num_dog_"
-        field_value_14 = collateral.num_dog
+
+        if(collateral):
+            field_value_08 = collateral.type.name
+            field_value_09 = collateral.name
+            field_value_9 = collateral.date_begin.strftime("%d")
+            collateral_date_begin_month_number = collateral.date_begin.strftime("%m")
+            collateral_date_begin_month_name = calendar.month_name[int(collateral_date_begin_month_number)]
+            field_value_10 = collateral_date_begin_month_name.capitalize()
+            field_value_11 = collateral.date_begin.strftime("%y")[1]
+            field_value_12 = "___________"
+            field_value_13 = collateral.num_dog
+            field_value_14 = collateral.num_dog
+        else:
+            field_value_08 = "___________"
+            field_value_09 = "___________"
+            field_value_9 = "___________"
+            field_value_10 = "___________"
+            field_value_11 = "___________"
+            field_value_12 = "___________"
+            field_value_13 = "___________"
+            field_value_14 = "___________"
+
+        
 
         field_name_15 = "_commission_rate_"
         field_value_15 = "2"
@@ -665,7 +668,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             except:
                 pass
         
-        for month in range(1, loan_term + 1):
+        for month in range(1, int(loan_term) + 1):
             if month <= loan_term:
                 monthly_commission = round(loan_amount * monthly_commission_in, 0)
             else:
@@ -751,19 +754,36 @@ class CreditViewSet(viewsets.ModelViewSet):
     def charge_account(self, client, amount):
         try:
             account = Account.objects.get(client=client)
-            account.balance += amount
+            account.amount += int(amount)
             account.save()
         except:
-            return Response({"error": "Не получилось пополнить счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
+            return 2
+        
+        return 1
     
     @staticmethod
     def discharge_account(self, client, amount):
         try:
             account = Account.objects.get(client=client)
-            account.balance -= amount
-            account.save()
         except:
-            return {"error": "Не получилось снять деньги со счёта клиента"}
+            print("status:2")
+            return 2
+        
+        print(account.amount, amount)
+        if(account.amount >= amount):
+            try:
+                account.amount -= int(amount)
+            except:
+                print("status:3")
+                return 3
+        else:
+            print("status:4")
+            return 4
+        account.save()
+        # 
+        
+        print("status:1")
+        return 1
 
     @action(detail=True, methods=['get'])
     def payment(self, request, pk=None):
@@ -789,28 +809,54 @@ class CreditViewSet(viewsets.ModelViewSet):
         except:
             return Response({"error": "Не получилось найти график оплаты кредита"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if(credit_payment_schedule.status.id == 2):
+        if(credit_payment_schedule.status.id != 1):
             return Response({"error": "Уже оплачено клиентом"}, status=status.HTTP_400_BAD_REQUEST)
         
         credit_payment_schedule.amount = payment_amount
 
         if(payment_amount < credit_payment_schedule.total_payment):
-            credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
-            credit_payment_schedule.not_paid_amount = credit_payment_schedule.total_payment - payment_amount
-            credit_payment_schedule.save()
 
+            self.charge_account(self, credit.client, payment_amount)
+
+            account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.total_payment)
             
-            next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number+1)
-            next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - payment_amount
-            next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - payment_amount
-            next_credit_payment_schedule.save()
+            if(account_action_status == 2):
+                return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if(account_action_status == 4 or account_action_status == 3):
+                account_action_status_ = self.discharge_account(self, credit.client, payment_amount)
 
+                credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
+                credit_payment_schedule.not_paid_amount = credit_payment_schedule.total_payment - int(payment_amount)
+                
+                next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=int(payment_number)+1)
+                next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - int(payment_amount)
+                next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - int(payment_amount)
+
+                credit_payment_schedule.save()
+                next_credit_payment_schedule.save()
+            else:
+                credit_payment_schedule.status = PaymentStatus.objects.get(id=2)
+                credit_payment_schedule.save()
             
         #150000 50000
         if(payment_amount > credit_payment_schedule.total_payment):
             if(credit_payment_schedule.total_payment*3<payment_amount):
                 return Response({"error": "payment_amount превосходит 3-х месячную оплату"}, status=status.HTTP_400_BAD_REQUEST)
             
+            self.charge_account(self, credit.client, payment_amount)
+
+            account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.total_payment)
+            
+            if(account_action_status == 2):
+                return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if(account_action_status == 4):
+                return Response({"error": "Не достаточно баланса на счёте клиента"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # self.charge_account(self, credit.client, payment_amount - float(credit_payment_schedule.total_payment))
+
+
             # next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number+1)
             # next_credit_payment_schedule.amount = payment_amount - next_credit_payment_schedule.total_payment
             # next_credit_payment_schedule.save()
@@ -822,10 +868,19 @@ class CreditViewSet(viewsets.ModelViewSet):
             
 
         if(payment_amount == credit_payment_schedule.total_payment):
+            account_action_status = self.discharge_account(self, credit.client, payment_amount)
+            
+            if(account_action_status == 2):
+                return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if(account_action_status == 4):
+                return Response({"error": "Не достаточно баланса на счёте клиента"}, status=status.HTTP_400_BAD_REQUEST)
+            
             credit_payment_schedule.status = PaymentStatus.objects.get(id=2)
             credit_payment_schedule.save()
+            
         
-        return Response({"success": "payment is success"}, status=status.HTTP_200_OK)
+        return Response({"success": "Оплата произошла"}, status=status.HTTP_200_OK)
 
 class CreditTreatmentViewSet(viewsets.ModelViewSet):
     queryset = CreditTreatments.objects.all()

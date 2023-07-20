@@ -29,6 +29,8 @@
                 <th>Погашение комиссии</th>
                 <th>Общая сумма платежа</th>
                 <th>Остаток основного долга</th>
+                <th>Неоплаченная сумма</th>
+                <th>Штрафная сумма</th>
                 <th>Дата для платежа</th>
                 <th>Дата платежа</th>
                 <th>Ежемесячная комиссия</th>
@@ -53,6 +55,8 @@
                   <td>{{ payment.commission_payment }}</td>
                   <td>{{ payment.total_payment }}</td>
                   <td>{{ payment.principal_remaining }}</td>
+                  <td>{{ payment.not_paid_amount }}</td>
+                  <td>{{ payment.penalty_commission }}</td>
                   <td>{{ payment.date_to_payment }}</td>
                   <td>{{ payment.date_get_payment|default:"Не оплачен"}}</td>
                   <td>{{ payment.monthly_commission }}</td>
