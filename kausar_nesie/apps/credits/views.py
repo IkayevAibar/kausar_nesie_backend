@@ -46,6 +46,8 @@ class CreditViewSet(viewsets.ModelViewSet):
     
     @staticmethod
     def fill_field(self, paragraph, field_name, field_value):
+        if(field_value == None):
+            field_value = "________________"
         if field_name in paragraph.text:
             run = paragraph.runs[0]  # Получаем первый Run в параграфе
             font_size = run.font.size  # Получаем размер шрифта
@@ -81,16 +83,19 @@ class CreditViewSet(viewsets.ModelViewSet):
         credit_client = credit.client
         
         client_docs = Docs.objects.filter(client=credit_client, identity_card_type=1).last()
+        
         if(client_docs == None):
             return Response({"error_message":"У клиента нет документа удостоверяющего личность"},status=status.HTTP_404_NOT_FOUND)
         
         client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
         client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
+        
         if(client_address_fact == None or client_address_reg == None):
             return Response({"error_message":"У клиента нет адресов"},status=status.HTTP_404_NOT_FOUND)
         
         client_contact_home = Contact.objects.filter(client=credit_client, contact_type=1).last()
         client_contact_phone = Contact.objects.filter(client=credit_client, contact_type=2).last()
+        
         if(client_contact_home == None or client_contact_phone == None):
             return Response({"error_message":"У клиента нет контактов"},status=status.HTTP_404_NOT_FOUND)
         
@@ -173,28 +178,16 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_name_13 = "_collateral_reg_num_"
         field_name_14 = "_collateral_num_dog_"
 
-        if(collateral):
-            field_value_08 = collateral.type.name
-            field_value_09 = collateral.name
-            field_value_9 = collateral.date_begin.strftime("%d")
-            collateral_date_begin_month_number = collateral.date_begin.strftime("%m")
-            collateral_date_begin_month_name = calendar.month_name[int(collateral_date_begin_month_number)]
-            field_value_10 = collateral_date_begin_month_name.capitalize()
-            field_value_11 = collateral.date_begin.strftime("%y")[1]
-            field_value_12 = "___________"
-            field_value_13 = collateral.num_dog
-            field_value_14 = collateral.num_dog
-        else:
-            field_value_08 = "___________"
-            field_value_09 = "___________"
-            field_value_9 = "___________"
-            field_value_10 = "___________"
-            field_value_11 = "___________"
-            field_value_12 = "___________"
-            field_value_13 = "___________"
-            field_value_14 = "___________"
-
-        
+        field_value_08 = collateral.type.name
+        field_value_09 = collateral.name
+        field_value_9 = collateral.date_begin.strftime("%d")
+        collateral_date_begin_month_number = collateral.date_begin.strftime("%m")
+        collateral_date_begin_month_name = calendar.month_name[int(collateral_date_begin_month_number)]
+        field_value_10 = collateral_date_begin_month_name.capitalize()
+        field_value_11 = collateral.date_begin.strftime("%y")[1]
+        field_value_12 = "___________"
+        field_value_13 = collateral.num_dog
+        field_value_14 = collateral.num_dog
 
         field_name_15 = "_commission_rate_"
         field_value_15 = "2"
