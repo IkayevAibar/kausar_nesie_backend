@@ -24,6 +24,64 @@ class AddressRetrieveSerializer(serializers.ModelSerializer):
 
 class IndividualClientSerializer(serializers.ModelSerializer):
     """Физическое лицо"""
+
+    def validate_reg_number(self, value):
+        """
+        Валидация поля reg_number: проверяем, что номер регистрации не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Номер регистрации не может быть пустым.")
+        return value
+
+    def validate_name(self, value):
+        """
+        Валидация поля name: проверяем, что имя не пустое.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Имя не может быть пустым.")
+        return value
+
+    def validate_surname(self, value):
+        """
+        Валидация поля surname: проверяем, что фамилия не пустая.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Фамилия не может быть пустой.")
+        return value
+    
+    def validate_date_of_birth(self, value):
+        # Валидация даты рождения, чтобы не была в будущем
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Дата рождения не может быть в будущем.")
+        return value
+
+    def validate_rnn(self, value):
+        # Валидация РНН (Регистрационный номер налогоплательщика)
+        if not value.isdigit() or len(value) != 12:
+            raise serializers.ValidationError("РНН должен состоять из 12 цифр.")
+        return value
+
+    def validate_iin(self, value):
+        # Валидация ИИН (Идентификационный номер налогоплательщика)
+        if not value.isdigit() or len(value) != 12:
+            raise serializers.ValidationError("ИИН должен состоять из 12 цифр.")
+        return value
+
+    def validate_sic(self, value):
+        # Валидация СИК (Страховой идентификационный номер)
+        if not value.isdigit() or len(value) != 11:
+            raise serializers.ValidationError("СИК должен состоять из 11 цифр.")
+        return value
+
+    # def validate_gender(self, value):
+    #     """
+    #     Валидация поля gender: проверяем, что выбран корректный вариант пола.
+    #     """
+    #     valid_genders = [choice[0] for choice in IndividualClient.GENDER_CHOICES]
+    #     if value not in valid_genders:
+    #         raise serializers.ValidationError("Выберите корректный пол.")
+    #     return value
+
     class Meta:
         model = IndividualClient
         fields = "__all__"
@@ -31,7 +89,61 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
 class CompanySerializer(serializers.ModelSerializer):
     """Юр лица"""
+    def validate_short_name(self, value):
+        """
+        Валидация поля short_name: проверяем, что короткое наименование не пустое.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Короткое наименование не может быть пустым.")
+        return value
 
+    def validate_full_name(self, value):
+        """
+        Валидация поля full_name: проверяем, что полное наименование не пустое.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Полное наименование не может быть пустым.")
+        return value
+
+    def validate_okpo(self, value):
+        """
+        Валидация поля okpo: проверяем, что ОКПО состоит из 8 или 10 цифр.
+        """
+        if not value.isdigit() or len(value) not in (8, 10):
+            raise serializers.ValidationError("ОКПО должен состоять из 8 или 10 цифр.")
+        return value
+
+    def validate_reg_num(self, value):
+        """
+        Валидация поля reg_num: проверяем, что регистрационный номер не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Регистрационный номер не может быть пустым.")
+        return value
+
+    def validate_reg_date(self, value):
+        """
+        Валидация поля reg_date: проверяем, что дата регистрации не находится в будущем.
+        """
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Дата регистрации не может быть в будущем.")
+        return value
+
+    def validate_certify_ser(self, value):
+        """
+        Валидация поля certify_ser: проверяем, что серия рег. удостоверения не пустая.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Серия рег. удостоверения не может быть пустой.")
+        return value
+
+    def validate_certify_num(self, value):
+        """
+        Валидация поля certify_num: проверяем, что номер рег. удостоверения не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Номер рег. удостоверения не может быть пустым.")
+        return value
     class Meta:
         model = Company
         fields = "__all__"
@@ -102,7 +214,7 @@ class ClientRetrieveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ClientSerializer(serializers.ModelSerializer):  
-    individual_client = IndividualClientSerializer(required=False)
+    individual_client = IndividualClientSerializer(required=True)
     class Meta:
         model = Client
         fields = "__all__"
@@ -134,8 +246,3 @@ class CompanyRetrieveSerializer(serializers.ModelSerializer):
         model = Company
         fields = "__all__"
 
-class RequisiteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Requisite
-        fields = "__all__"

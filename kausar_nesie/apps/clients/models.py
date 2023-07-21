@@ -167,14 +167,6 @@ class Contact(models.Model):
         verbose_name = "Контакт"
         verbose_name_plural = "Контакты"
 
-class Requisite(models.Model):
-    """ Реквизиты """
-    client = models.ForeignKey("Client", verbose_name="Индификатор физического лица", on_delete=models.CASCADE, related_name='requisites')
-    to_cash = models.BooleanField(verbose_name="Реквизиты для выдачи. Через кассу",null=False, default=False)
-    req_acc = models.CharField(max_length=35, verbose_name="Реквизиты для выдачи. Счет", blank=True, null=True)
-    req_bank = models.ForeignKey("catalog.Bank", verbose_name="Реквизиты для выдачи. Банк", on_delete=models.CASCADE,blank=False, null=False)
-    req_name = models.CharField(max_length=255, verbose_name="Реквизиты для выдачи. Клиент", blank=True, null=True)
-    req_kbe = models.CharField(max_length=2, verbose_name="Реквизиты для выдачи. КБе", blank=True, null=True)
 
 
 # class IdCard(models.Model):

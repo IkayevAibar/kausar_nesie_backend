@@ -48,3 +48,9 @@ class CreditLineSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditLine
         fields = "__all__"
+
+class RequisiteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Requisite
+        fields = "__all__"

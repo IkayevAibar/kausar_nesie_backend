@@ -134,3 +134,20 @@ class CreditPaymentSchedule(models.Model):
         verbose_name = "График платежей"
         verbose_name_plural = "Графики платежей"
         unique_together = ('credit', 'number')
+
+class Requisite(models.Model):
+    """ Реквизиты """
+    client = models.ForeignKey("clients.Client", verbose_name="Индификатор физического лица", on_delete=models.CASCADE, related_name='requisites')
+    to_cash = models.BooleanField(verbose_name="Реквизиты для выдачи. Через кассу",null=False, default=False)
+    req_acc = models.CharField(max_length=35, verbose_name="Реквизиты для выдачи. IBAN", blank=True, null=True)
+    req_bank = models.ForeignKey("catalog.Bank", verbose_name="Реквизиты для выдачи. Банк", on_delete=models.CASCADE,blank=False, null=False)
+    req_name = models.CharField(max_length=255, verbose_name="Реквизиты для выдачи. ФИО", blank=True, null=True)
+    req_kbe = models.CharField(max_length=2, verbose_name="Реквизиты для выдачи. КБе", blank=True, null=True)
+    req_kbe = models.CharField(max_length=10, verbose_name="Реквизиты для выдачи. Период действия", blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.client} - {self.req_name}"
+    
+    class Meta:
+        verbose_name = "Реквизиты"
+        verbose_name_plural = "Реквизиты"

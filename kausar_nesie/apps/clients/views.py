@@ -129,7 +129,3 @@ class ContactViewSet(viewsets.ModelViewSet):
             return ContactRetrieveSerializer
         return self.serializer_class
 
-class RequisiteViewSet(viewsets.ModelViewSet):
-    queryset = Requisite.objects.all()
-    serializer_class = RequisiteSerializer
-    permission_classes = [AllowAny]

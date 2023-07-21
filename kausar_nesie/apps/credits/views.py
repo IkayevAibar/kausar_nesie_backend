@@ -355,7 +355,8 @@ class CreditViewSet(viewsets.ModelViewSet):
         loan_term = credit.period_count
         loan_amount = float(credit.amount)
         commission_rate = 2
-        days_in_first_payment = 30
+        calculated_days = credit.date_begin - credit.date_sign
+        days_in_first_payment = 30 + calculated_days.days
         days_in_last_payment = 30
         monthly_commission_in = 0
 
@@ -559,6 +560,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         
         temp_principal_remaining = prev_principal_remaining - pp
         days_in_first_payment = 30
+        days_in_last_payment = 30
         monthly_commission_in = 0
         percent_rate = float(credit.effective_rate)
         loan_term = credit.period_count - int(number)
@@ -569,19 +571,13 @@ class CreditViewSet(viewsets.ModelViewSet):
         sum_of_principal_remaining = 0
         sum_of_monthly_commission = 0
         for item in cpss:
-            if item.number <= loan_term + int(number):
-                monthly_commission = round(credit.amount * monthly_commission_in, 0)
-            else:
-                monthly_commission = 0
-            # Высчитываем Погашение ОД
-            if item.number < loan_term + int(number):
-                principal_payment= round(monthly_payment - (principal_remaining*percent_rate/100/12),0)
-            else:
-                if item.number == loan_term:
-                    principal_payment = round(principal_remaining,0)
-                else:
-                    principal_payment = 0
-            commission_payment  = round((principal_remaining*percent_rate/100/12)/30*days_in_first_payment,0)
+
+            row = self.row_calculator(self=self, month=item.number, loan_term=loan_term, loan_amount=credit.amount, monthly_commission_in=monthly_commission_in, percent_rate=percent_rate, credit_payment_type=1, days_in_first_payment=days_in_first_payment, days_in_last_payment=days_in_last_payment, principal_remaining=principal_remaining, monthly_payment=monthly_payment)
+            
+            principal_payment = row['principal_payment']
+            commission_payment = row['commission_payment']
+            monthly_commission = row['monthly_commission']
+            
             # Высчитываем Сумма %
             sum_income+=commission_payment
             # Высчитываем Остаток ОД
@@ -615,6 +611,39 @@ class CreditViewSet(viewsets.ModelViewSet):
         day = min(sourcedate.day, calendar.monthrange(year,month)[1])
         return datetime.date(year, month, day)
     
+    @staticmethod
+    def row_calculator(self, month, loan_term, loan_amount, monthly_commission_in, percent_rate, credit_payment_type, days_in_first_payment, days_in_last_payment, principal_remaining, monthly_payment):
+        if month <= loan_term:
+            monthly_commission = round(loan_amount * monthly_commission_in, 0)
+        else:
+            monthly_commission = 0
+        # Высчитываем Погашение ОД
+        if month < loan_term:
+            if(credit_payment_type == 1):
+                principal_payment= round(monthly_payment - (principal_remaining*percent_rate/100/12),0)
+            else:
+                principal_payment = round(loan_amount/loan_term,0)
+        else:
+            if month == loan_term:
+                principal_payment = round(principal_remaining,0)
+            else:
+                principal_payment = 0
+        # Высчитываем Погашение возн.
+        if(month == 1):
+            commission_payment  = round((principal_remaining * percent_rate/100/12)/30*days_in_first_payment,0)
+        else:
+            if month == loan_term:
+                temp_commission = (principal_remaining * percent_rate / 100 / 12) / 30 * days_in_last_payment
+            else:
+                temp_commission = principal_remaining * percent_rate / 100 / 12
+            commission_payment  = round(temp_commission, 0)
+        
+        return {
+            "monthly_commission": monthly_commission,
+            "principal_payment": principal_payment,
+            "commission_payment": commission_payment
+        }
+
     @staticmethod
     def calculate_payment(self, credit, percent_rate, loan_term, loan_amount, commission_rate, days_in_first_payment, days_in_last_payment, monthly_commission_in, credit_payment_type=1, with_creation=True, reset=False):
         # Расчетные данные
@@ -675,31 +704,12 @@ class CreditViewSet(viewsets.ModelViewSet):
                 pass
         
         for month in range(1, int(loan_term) + 1):
-            if month <= loan_term:
-                monthly_commission = round(loan_amount * monthly_commission_in, 0)
-            else:
-                monthly_commission = 0
-            # Высчитываем Погашение ОД
-            if month < loan_term:
-                if(credit_payment_type == 1):
-                    principal_payment= round(monthly_payment - (principal_remaining*percent_rate/100/12),0)
-                else:
-                    principal_payment = round(loan_amount/loan_term,0)
-            else:
-                if month == loan_term:
-                    principal_payment = round(principal_remaining,0)
-                else:
-                    principal_payment = 0
-            # Высчитываем Погашение возн.
-            if(month == 1):
-                commission_payment  = round((principal_remaining * percent_rate/100/12)/30*days_in_first_payment,0)
-            else:
-                if month == loan_term:
-                    temp_commission = (principal_remaining * percent_rate / 100 / 12) / 30 * days_in_last_payment
-                else:
-                    temp_commission = principal_remaining * percent_rate / 100 / 12
-                commission_payment  = round(temp_commission)
+            row = self.row_calculator(self, month, loan_term, loan_amount, monthly_commission_in, percent_rate, credit_payment_type, days_in_first_payment, days_in_last_payment, principal_remaining, monthly_payment)
             
+            commission_payment = row["commission_payment"]
+            principal_payment = row["principal_payment"]
+            monthly_commission = row["monthly_commission"]
+
             # Высчитываем Сумма %
             sum_income+=commission_payment
             # Высчитываем Общая сумма ОД+%+ком
@@ -968,3 +978,9 @@ class CreditLineViewSet(viewsets.ModelViewSet):
         credit_line.credits.add(credit)
         
         return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class RequisiteViewSet(viewsets.ModelViewSet):
+    queryset = Requisite.objects.all()
+    serializer_class = RequisiteSerializer
+    permission_classes = [permissions.AllowAny]
