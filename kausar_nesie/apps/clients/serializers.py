@@ -169,7 +169,48 @@ class AccountSerializer(serializers.ModelSerializer):
 
 class DocsSerializer(serializers.ModelSerializer):
     """Документы"""
+    
+    def validate_number(self, value):
+        """
+        Валидация поля number: проверяем, что номер документа не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Номер документа не может быть пустым.")
+        return value
 
+    def validate_series(self, value):
+        """
+        Валидация поля series: проверяем, что серия документа не пустая.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Серия документа не может быть пустой.")
+        return value
+
+    def validate_start_date(self, value):
+        """
+        Валидация поля start_date: проверяем, что дата начала не находится в будущем.
+        """
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Дата начала не может быть в будущем.")
+        return value
+
+    def validate_end_date(self, value):
+        """
+        Валидация поля end_date: проверяем, что дата окончания не находится в будущем и не меньше даты начала.
+        """
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Дата окончания не может быть в будущем.")
+        if value < self.initial_data.get('start_date', value):
+            raise serializers.ValidationError("Дата окончания не может быть меньше даты начала.")
+        return value
+
+    def validate_issued_by(self, value):
+        """
+        Валидация поля issued_by: проверяем, что поле не пустое.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Поле 'Кем выдан' не может быть пустым.")
+        return value
     class Meta:
         model = Docs
         fields = "__all__"

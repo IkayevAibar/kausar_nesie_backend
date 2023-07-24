@@ -76,7 +76,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             days_in_first_payment = 30
             days_in_last_payment = 30
             monthly_commission_in = 0
-            data = self.calculate_payment(self= self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=False, reset=False)
+            data = self.calculate_payment(self= self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, days_in_last_payment=days_in_last_payment, monthly_commission_in=monthly_commission_in, with_creation=False, reset=False, credit_payment_type=1)
         except:
             return Response({"error_message":"Ошибка при расчете платежей"},status=status.HTTP_404_NOT_FOUND)        
         
@@ -360,7 +360,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         days_in_last_payment = 30
         monthly_commission_in = 0
 
-        data = self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=True)
+        data = self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=loan_term, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, days_in_last_payment=days_in_last_payment, monthly_commission_in=monthly_commission_in, with_creation=True, credit_payment_type=1)
         
         return Response({"message": "График платежей успешно создан"})
         # return JsonResponse(data, safe=False)
