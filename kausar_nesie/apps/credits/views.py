@@ -357,9 +357,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         commission_rate = 2
         if(credit.date_sign):
             calculated_days = credit.date_begin - credit.date_sign
+            days_in_first_payment = 30 + calculated_days.days
         else:
-            calculated_days = credit.date_begin
-        days_in_first_payment = 30 + calculated_days.days
+            days_in_first_payment = 30
+        
         days_in_last_payment = 30
         monthly_commission_in = 0
 
