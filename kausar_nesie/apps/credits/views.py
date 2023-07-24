@@ -165,9 +165,9 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_name_8 = "_year_effect_rate_persent_string_"
         field_value_8 = num2words(str(commission_rate).rstrip("0").rstrip("."), lang='ru')
 
-        try:
-            collateral = Collateral.objects.filter(client=credit.client).last()
-        except:
+        collateral = Collateral.objects.filter(client=credit.client).last()
+        
+        if(collateral == None):
             return Response({"error_message":"У клиента нет залога"},status=status.HTTP_404_NOT_FOUND)
         
         field_name_08 = "_collateral_type_"
