@@ -766,6 +766,7 @@ class CreditViewSet(viewsets.ModelViewSet):
                     payment_schedule.monthly_commission = monthly_commission
                     payment_schedule.status = PaymentStatus.objects.get(id=1)
                     payment_schedule.penalty_commission = 0
+                    payment_schedule.not_paid_amount = 0
                     payment_schedule.save()
                 except:
                     pass 
