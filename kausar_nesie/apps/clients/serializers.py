@@ -269,10 +269,9 @@ class DocsSerializer(serializers.ModelSerializer):
 
     def validate_end_date(self, value):
         """
-        Валидация поля end_date: проверяем, что дата окончания не находится в будущем и не меньше даты начала.
+        Валидация поля end_date: проверяем, что дата окончания не меньше даты начала.
         """
-        if value > timezone.now().date():
-            raise serializers.ValidationError("Дата окончания не может быть в будущем.")
+        
         if value < self.initial_data.get('start_date', value):
             raise serializers.ValidationError("Дата окончания не может быть меньше даты начала.")
         return value
