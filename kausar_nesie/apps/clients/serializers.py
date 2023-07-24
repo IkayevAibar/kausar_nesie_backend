@@ -232,7 +232,10 @@ class AccountSerializer(serializers.ModelSerializer):
         """
         Валидация поля date_close: проверяем, что дата закрытия счета не меньше даты открытия.
         """
-        if value and self.initial_data.get('date_open') and value < self.initial_data.get('date_open'):
+        date_open_str = self.initial_data.get('date_open')
+        date_open = datetime.datetime.strptime(date_open_str, "%Y-%m-%d").date()
+
+        if value and date_open and value < date_open:
             raise serializers.ValidationError("Дата закрытия счета не может быть меньше даты открытия.")
         return value
     
