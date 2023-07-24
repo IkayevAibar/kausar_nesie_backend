@@ -355,7 +355,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         loan_term = credit.period_count
         loan_amount = float(credit.amount)
         commission_rate = 2
-        calculated_days = credit.date_begin - credit.date_sign
+        if(credit.date_sign):
+            calculated_days = credit.date_begin - credit.date_sign
+        else:
+            calculated_days = credit.date_begin
         days_in_first_payment = 30 + calculated_days.days
         days_in_last_payment = 30
         monthly_commission_in = 0
