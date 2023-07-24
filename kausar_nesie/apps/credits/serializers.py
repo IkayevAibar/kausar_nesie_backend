@@ -9,7 +9,6 @@ class CreditSerializer(serializers.ModelSerializer):
     """Credit Create/Update"""
     request = serializers.IntegerField(read_only=True)
     date_close = serializers.DateField(read_only=True)
-    date_sign = serializers.DateField(read_only=True)
     class Meta:
         model = Credit
         fields = "__all__"
