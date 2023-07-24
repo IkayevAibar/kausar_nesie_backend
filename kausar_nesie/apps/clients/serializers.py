@@ -203,6 +203,38 @@ class CompanyInClientRetrieveSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     """Счета"""
 
+    def validate_amount(self, value):
+        """
+        Валидация поля amount: проверяем, что остаток на счете неотрицательный.
+        """
+        if value < 0:
+            raise serializers.ValidationError("Остаток на счете не может быть отрицательным.")
+        return value
+
+    def validate_acc_num(self, value):
+        """
+        Валидация поля acc_num: проверяем, что номер счета не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Номер счета не может быть пустым.")
+        return value
+
+    def validate_date_open(self, value):
+        """
+        Валидация поля date_open: проверяем, что дата открытия счета не находится в будущем.
+        """
+        if value and value > timezone.now().date():
+            raise serializers.ValidationError("Дата открытия счета не может быть в будущем.")
+        return value
+
+    def validate_date_close(self, value):
+        """
+        Валидация поля date_close: проверяем, что дата закрытия счета не меньше даты открытия.
+        """
+        if value and self.initial_data.get('date_open') and value < self.initial_data.get('date_open'):
+            raise serializers.ValidationError("Дата закрытия счета не может быть меньше даты открытия.")
+        return value
+    
     class Meta:
         model = Account
         fields = "__all__"
