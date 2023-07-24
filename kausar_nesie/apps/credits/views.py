@@ -384,7 +384,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         monthly_commission_in = 0
 
         try:
-            self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=credit.period_count, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, monthly_commission_in=monthly_commission_in, with_creation=True, reset=True)
+            self.calculate_payment(self=self, credit=credit, percent_rate=percent_rate, loan_term=credit.period_count, loan_amount=loan_amount, commission_rate=commission_rate, days_in_first_payment=days_in_first_payment, days_in_last_payment=days_in_last_payment, monthly_commission_in=monthly_commission_in, with_creation=True, reset=True, credit_payment_type=1)
         except:
             return Response({"message": "Не удалось обнулить график платежей"})
         

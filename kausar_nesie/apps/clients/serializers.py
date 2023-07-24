@@ -11,6 +11,30 @@ import re
 class AddressSerializer(serializers.ModelSerializer):
     """Адреса клиента"""
 
+    def validate_house(self, value):
+        """
+        Валидация поля house: проверяем, что номер дома не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Номер дома не может быть пустым.")
+        return value
+    
+    def validate_flat(self, value):
+        """
+        Валидация поля flat: проверяем, что номер квартиры не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Номер квартиры не может быть пустым.")
+        return value
+    
+    def validate_post_index(self, value):
+        """
+        Валидация поля post_index: проверяем, что индекс не пустой.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Индекс не может быть пустым.")
+        return value
+
     class Meta:
         model = Address
         fields = "__all__"
