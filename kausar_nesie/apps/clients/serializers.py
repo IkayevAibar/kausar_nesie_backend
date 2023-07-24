@@ -66,7 +66,7 @@ class IndividualClientSerializer(serializers.ModelSerializer):
         """
         if not value:
             raise serializers.ValidationError("Поле 'Имя' обязательно.")
-        if not re.match(r'^[A-Za-z-]+$', value):
+        if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
             raise serializers.ValidationError("Поле 'Имя' должно содержать только буквы и дефисы.")
         return value
 
@@ -76,7 +76,7 @@ class IndividualClientSerializer(serializers.ModelSerializer):
         """
         if not value:
             raise serializers.ValidationError("Поле 'Фамилия' обязательно.")
-        if not re.match(r'^[A-Za-z-]+$', value):
+        if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
             raise serializers.ValidationError("Поле 'Фамилия' должно содержать только буквы и дефисы.")
         return value
 
@@ -87,7 +87,7 @@ class IndividualClientSerializer(serializers.ModelSerializer):
         if value is None:
             return value  # Разрешаем значение None (null=True)
 
-        if not re.match(r'^[A-Za-z-]+$', value):
+        if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
             raise serializers.ValidationError("Поле 'Отчество' должно содержать только буквы и дефисы.")
         return value
     
