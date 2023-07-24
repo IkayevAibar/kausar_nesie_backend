@@ -7,6 +7,7 @@ from .models import *
 from apps.catalog.serializers import *
 
 import re
+import datetime
 
 class AddressSerializer(serializers.ModelSerializer):
     """Адреса клиента"""
@@ -271,8 +272,10 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         Валидация поля end_date: проверяем, что дата окончания не меньше даты начала.
         """
+        start_date_str = self.initial_data.get('start_date', value)
+        start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d").date()
         
-        if value < self.initial_data.get('start_date', value):
+        if value < start_date:
             raise serializers.ValidationError("Дата окончания не может быть меньше даты начала.")
         return value
 
