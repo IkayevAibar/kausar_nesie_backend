@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from .models import *
 from apps.catalog.serializers import *
 
+import re
+
 class AddressSerializer(serializers.ModelSerializer):
     """Адреса клиента"""
 
@@ -35,18 +37,33 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
     def validate_name(self, value):
         """
-        Валидация поля name: проверяем, что имя не пустое.
+        Валидация поля name: проверяем, что имя содержит только буквы и дефисы, если указано.
         """
-        if not value.strip():
-            raise serializers.ValidationError("Имя не может быть пустым.")
+        if not value:
+            raise serializers.ValidationError("Поле 'Имя' обязательно.")
+        if not re.match(r'^[A-Za-z-]+$', value):
+            raise serializers.ValidationError("Поле 'Имя' должно содержать только буквы и дефисы.")
         return value
 
     def validate_surname(self, value):
         """
-        Валидация поля surname: проверяем, что фамилия не пустая.
+        Валидация поля surname: проверяем, что фамилия содержит только буквы и дефисы, если указана.
         """
-        if not value.strip():
-            raise serializers.ValidationError("Фамилия не может быть пустой.")
+        if not value:
+            raise serializers.ValidationError("Поле 'Фамилия' обязательно.")
+        if not re.match(r'^[A-Za-z-]+$', value):
+            raise serializers.ValidationError("Поле 'Фамилия' должно содержать только буквы и дефисы.")
+        return value
+
+    def validate_middle_name(self, value):
+        """
+        Валидация поля middle_name: проверяем, что отчество содержит только буквы и дефисы, если указано.
+        """
+        if value is None:
+            return value  # Разрешаем значение None (null=True)
+
+        if not re.match(r'^[A-Za-z-]+$', value):
+            raise serializers.ValidationError("Поле 'Отчество' должно содержать только буквы и дефисы.")
         return value
     
     def validate_date_of_birth(self, value):

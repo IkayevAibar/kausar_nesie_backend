@@ -428,7 +428,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             if(cps.total_payment > payment_amount):
                 return Response({"error_message": "Сумма досрочного платежа больше суммы платежа"})
             
-            if(number>1):
+            if(number>0):
                 prev_cps = CreditPaymentSchedule.objects.get(credit=credit, number=number-1)
 
                 if number < credit.period_count:
@@ -539,9 +539,11 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         cps = CreditPaymentSchedule.objects.get(credit=credit, number=number)
 
-        if(int(number)>1):
+        if(int(number)>0):
             cps2 = CreditPaymentSchedule.objects.get(credit=credit, number=int(number)-1)
             prev_principal_remaining = float(cps2.principal_remaining)
+        else:
+            return Response({"error_message": "Неверный номер платежа"})
         
         if int(number) < credit.period_count:
             new_principal_payment= round(float(payment_amount) - (float(cps2.principal_remaining)*float(credit.effective_rate)/100/12),0)
