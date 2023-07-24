@@ -90,6 +90,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         client_address_fact = Address.objects.filter(client=credit_client, addr_type=1).last()
         client_address_reg = Address.objects.filter(client=credit_client, addr_type=2).last()
         
+        return Response({"client_address_fact": client_address_fact, "client_address_reg": client_address_reg},status=status.HTTP_404_NOT_FOUND)
         if(client_address_fact == None or client_address_reg == None):
             return Response({"error_message":"У клиента нет адресов"},status=status.HTTP_404_NOT_FOUND)
         
