@@ -19,7 +19,7 @@ class CollateralSerializer(serializers.ModelSerializer):
         if value == None:
             raise serializers.ValidationError("Дата окончания не может быть пустой")
 
-        if value < self.validated_data.get("date_begin"):
+        if value < self.initial_data.get("date_begin"):
             raise serializers.ValidationError("Дата окончания не может быть раньше даты начала")
         
         return value
@@ -28,6 +28,9 @@ class CollateralSerializer(serializers.ModelSerializer):
         if value == None:
             raise serializers.ValidationError("Сумма не может быть пустой")
 
+        if not value.isdigit():
+            raise serializers.ValidationError("Сумма должна быть числом")
+        
         if value <= 0:
             raise serializers.ValidationError("Сумма должна быть больше 0")
 
