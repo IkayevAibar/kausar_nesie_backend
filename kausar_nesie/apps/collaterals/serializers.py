@@ -32,10 +32,10 @@ class CollateralSerializer(serializers.ModelSerializer):
         if value is None:
             raise serializers.ValidationError("Сумма не может быть пустой")
 
-        if not str(value).isnumeric():
+        if not value.isdecimal():
             raise serializers.ValidationError("Сумма должна быть числом")
 
-        if Decimal(value) <= 0:
+        if value <= 0:
             raise serializers.ValidationError("Сумма должна быть больше 0")
 
         return value
