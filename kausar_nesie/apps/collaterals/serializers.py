@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from .models import *
 from django.utils import timezone
 import datetime
+from decimal import Decimal
 
 class CollateralSerializer(serializers.ModelSerializer):
     """Договора обеспечения"""
@@ -28,14 +29,16 @@ class CollateralSerializer(serializers.ModelSerializer):
         return value
 
     def validate_amount(self, value):
-        if value == None:
+        if value is None:
             raise serializers.ValidationError("Сумма не может быть пустой")
 
-        if not value.isdigit():
+        if not str(value).isnumeric():
             raise serializers.ValidationError("Сумма должна быть числом")
-        
-        if value <= 0:
+
+        if Decimal(value) <= 0:
             raise serializers.ValidationError("Сумма должна быть больше 0")
+
+        return value
 
         return value
     
