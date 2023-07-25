@@ -269,6 +269,10 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         if value > timezone.now().date():
             raise serializers.ValidationError("Дата начала не может быть в будущем.")
+        
+        if value.year < 1900:
+            raise serializers.ValidationError("Дата не может быть раньше 1900 года.")
+        
         return value
 
     def validate_end_date(self, value):
@@ -288,7 +292,7 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         if not value.strip():
             raise serializers.ValidationError("Поле 'Кем выдан' не может быть пустым.")
-        return value
+        return re.sub(r'\D', '', value)
     class Meta:
         model = Docs
         fields = "__all__"
@@ -299,11 +303,21 @@ class ContactSerializer(serializers.ModelSerializer):
 
     def validate_value(self, value):
         """
-        Валидация поля value: проверяем, что поле не пустое.
+        Валидация поля value: проверяем, что поле не пустое,
+        а также что содержимое является либо электронной почтой, либо номером телефона.
         """
         if not value.strip():
             raise serializers.ValidationError("Поле 'Значение' не может быть пустым.")
-        return re.sub(r'\D', '', value)
+
+        # Проверка на электронную почту
+        if re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
+            return value
+
+        # Проверка на номер телефона
+        if re.match(r'^\+?[0-9]+$', value):
+            return value
+
+        raise serializers.ValidationError("Некорректный формат 'Значения'. Пожалуйста, введите корректный адрес электронной почты или номер телефона.")
 
     class Meta:
         model = Contact
