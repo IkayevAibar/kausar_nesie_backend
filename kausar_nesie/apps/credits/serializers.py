@@ -48,7 +48,39 @@ class CreditLineSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class RequisiteSerializer(serializers.ModelSerializer):
+    """Requisite Create/Update"""
 
+    def validate_req_acc(self, value):
+        if value == None:
+            raise serializers.ValidationError("IBAN не может быть пустым")
+        
+        value = value.replace(" ", "")
+
+        if len(value) != 20:
+            raise serializers.ValidationError("IBAN должен состоять из 20 символов")
+        return value
+
+    def validate_req_name(self, value):
+        if value == None:
+            raise serializers.ValidationError("ФИО не может быть пустым")
+        
+        return value.strip().upper()
+
+    def validate_req_kbe(self, value):
+        if value == None:
+            raise serializers.ValidationError("КБЕ не может быть пустым")
+        
+        value = value.replace(" ", "")
+
+        if len(value) != 2:
+            raise serializers.ValidationError("КБЕ должен состоять из 2 символов")
+        return value
+    
+    def validate_req_perioud(self, value):
+        if value == None:
+            raise serializers.ValidationError("Период не может быть пустым")
+        return value
+    
     class Meta:
         model = Requisite
         fields = "__all__"

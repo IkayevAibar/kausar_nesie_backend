@@ -143,7 +143,7 @@ class Requisite(models.Model):
     req_bank = models.ForeignKey("catalog.Bank", verbose_name="Реквизиты для выдачи. Банк", on_delete=models.CASCADE,blank=False, null=False)
     req_name = models.CharField(max_length=255, verbose_name="Реквизиты для выдачи. ФИО", blank=True, null=True)
     req_kbe = models.CharField(max_length=2, verbose_name="Реквизиты для выдачи. КБе", blank=True, null=True)
-    req_kbe = models.CharField(max_length=10, verbose_name="Реквизиты для выдачи. Период действия", blank=True, null=True)
+    req_perioud = models.DateField(max_length=10, verbose_name="Реквизиты для выдачи. Период действия", blank=True, null=True)
     
     def __str__(self):
         return f"{self.client} - {self.req_name}"
