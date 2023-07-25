@@ -253,6 +253,10 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         if not value.strip():
             raise serializers.ValidationError("Номер документа не может быть пустым.")
+        
+        if not re.match(r'^[0-9]+$', value):
+            raise serializers.ValidationError("Номер документа может содержать только цифры.")
+        
         return value
 
     def validate_series(self, value):
@@ -261,6 +265,10 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         if not value.strip():
             raise serializers.ValidationError("Серия документа не может быть пустой.")
+        
+        if not re.match(r'^[a-zA-Z0-9]+$', value):
+            raise serializers.ValidationError("Серия документа может содержать только буквы и цифры.")
+        
         return value
 
     def validate_start_date(self, value):
@@ -292,6 +300,10 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         if not value.strip():
             raise serializers.ValidationError("Поле 'Кем выдан' не может быть пустым.")
+        
+        if not re.match(r'^[a-zA-Z0-9\s]+$', value):
+            raise serializers.ValidationError("Поле 'Кем выдан' может содержать только буквы, цифры и пробелы.")
+
         return re.sub(r'\D', '', value)
     class Meta:
         model = Docs
