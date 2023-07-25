@@ -309,16 +309,21 @@ class ContactSerializer(serializers.ModelSerializer):
         if not value.strip():
             raise serializers.ValidationError("Поле 'Значение' не может быть пустым.")
 
+        # Получаем значение типа контакта из данных сериализации
+        contact_type = self.initial_data.get('contact_type')
+        print(contact_type)
         # Проверка на электронную почту
-        if re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
-            return value
+        if contact_type == "3" or contact_type.code == "5":
+            if not re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
+                raise serializers.ValidationError("Некорректный формат электронной почты.")
 
         # Проверка на номер телефона
-        if re.match(r'^\+?[0-9]+$', value):
-            return value
+        if contact_type.code == "1" or contact_type.code == "2" or contact_type.code == "4":
+            if not re.match(r'^\+?[0-9]+$', value):
+                raise serializers.ValidationError("Некорректный формат номера телефона.")
 
-        raise serializers.ValidationError("Некорректный формат 'Значения'. Пожалуйста, введите корректный адрес электронной почты или номер телефона.")
-
+        return value
+    
     class Meta:
         model = Contact
         fields = "__all__"
