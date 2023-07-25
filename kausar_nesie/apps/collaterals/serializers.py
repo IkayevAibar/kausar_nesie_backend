@@ -20,7 +20,7 @@ class CollateralSerializer(serializers.ModelSerializer):
         if value == None:
             raise serializers.ValidationError("Дата окончания не может быть пустой")
         
-        end_date_str = self.initial_data.get('start_date', value)
+        end_date_str = self.initial_data.get('date_end', value)
         end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()
         if value < end_date:
             raise serializers.ValidationError("Дата окончания не может быть раньше даты начала")
