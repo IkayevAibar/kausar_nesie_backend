@@ -313,12 +313,12 @@ class ContactSerializer(serializers.ModelSerializer):
         contact_type = self.initial_data.get('contact_type')
         print(contact_type)
         # Проверка на электронную почту
-        if contact_type == "3" or contact_type.code == "5":
+        if contact_type == "3" or contact_type == "5":
             if not re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
                 raise serializers.ValidationError("Некорректный формат электронной почты.")
 
         # Проверка на номер телефона
-        if contact_type.code == "1" or contact_type.code == "2" or contact_type.code == "4":
+        if contact_type == "1" or contact_type == "2" or contact_type == "4":
             if not re.match(r'^\+?[0-9]+$', value):
                 raise serializers.ValidationError("Некорректный формат номера телефона.")
 
