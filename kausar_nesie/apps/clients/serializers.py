@@ -296,13 +296,17 @@ class DocsSerializer(serializers.ModelSerializer):
 
     def validate_issued_by(self, value):
         """
-        Валидация поля issued_by: проверяем, что поле не пустое.
+        Валидация поля issued_by: проверяем, что поле не пустое и содержит только
+        буквы английского, русского и казахского алфавитов, а также пробелы.
         """
         if not value.strip():
             raise serializers.ValidationError("Поле 'Кем выдан' не может быть пустым.")
-        
-        if not re.match(r'^[a-zA-Z0-9\s]+$', value):
-            raise serializers.ValidationError("Поле 'Кем выдан' может содержать только буквы, цифры и пробелы.")
+
+        # Проверяем, что в поле issued_by нет лишних символов, кроме букв и пробелов
+        if not re.match(r'^[a-zA-Zа-яА-Яғқңәіһүұққ\s]+$', value):
+            raise serializers.ValidationError("Поле 'Кем выдан' может содержать только буквы английского, русского и казахского алфавитов, а также пробелы.")
+
+        return value
 
         return re.sub(r'\D', '', value)
     class Meta:
