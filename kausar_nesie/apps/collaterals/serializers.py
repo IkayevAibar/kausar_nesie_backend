@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
 from django.utils import timezone
+import datetime
 
 class CollateralSerializer(serializers.ModelSerializer):
     """Договора обеспечения"""
@@ -18,8 +19,10 @@ class CollateralSerializer(serializers.ModelSerializer):
     def validate_date_end(self, value):
         if value == None:
             raise serializers.ValidationError("Дата окончания не может быть пустой")
-
-        if value < self.initial_data.get("date_begin"):
+        
+        end_date_str = self.initial_data.get('start_date', value)
+        end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()
+        if value < end_date:
             raise serializers.ValidationError("Дата окончания не может быть раньше даты начала")
         
         return value

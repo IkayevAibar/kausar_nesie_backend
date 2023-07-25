@@ -331,7 +331,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
         # Получаем значение типа контакта из данных сериализации
         contact_type = self.initial_data.get('contact_type')
-        print(contact_type)
+
         # Проверка на электронную почту
         if contact_type == "3" or contact_type == "5":
             if not re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
