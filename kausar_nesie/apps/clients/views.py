@@ -110,7 +110,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
     permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['acc_num', 'client', 'id']
+    search_fields = ['acc_num', 'id']
     ordering_fields = ['id', 'balance', 'date_open']
 
 
