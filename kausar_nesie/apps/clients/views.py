@@ -109,7 +109,9 @@ class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_classes = [AllowAny]
-
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['acc_num', 'client', 'id']
+    ordering_fields = ['id', 'balance', 'date_open']
 
 
 class DocsViewSet(viewsets.ModelViewSet):

@@ -6,8 +6,6 @@ User = get_user_model()
 
 class Collateral(models.Model):
     """Договора обеспечения"""
-
-    
     num_dog = models.CharField(max_length=20, verbose_name="Номер договора", blank=True, null=True)
     is_evaluated = models.BooleanField(verbose_name="Оценка", default= False, blank=True, null=True)
     is_insured = models.BooleanField(verbose_name="Страховка", default= False, blank=True, null=True)
@@ -22,7 +20,6 @@ class Collateral(models.Model):
                              blank=True, null=False)
     client = models.ForeignKey('clients.Client', verbose_name="Идентификатор залогодателя", on_delete=models.CASCADE,
                                blank=True, null=False)
-    
     coborrowers = models.ManyToManyField("clients.IndividualClient", verbose_name="Созаемщики", related_name="collateral_coborrowers", blank=True)
     documents = models.ManyToManyField("CollateralDocuments", verbose_name="Документы", related_name="documents", blank=True)
 
@@ -38,7 +35,6 @@ class Collateral(models.Model):
     emp = models.ForeignKey(User, verbose_name="Ответственный сотрудник",
                             on_delete=models.SET_NULL, blank=True, null=True)
     date_close = models.DateField(verbose_name="Дата закрытия", null=True, blank=True)
-    
     name = models.CharField(max_length=255 ,null=True, blank=True, verbose_name="Наименование залоговой ценности")
     # market_value = models.DecimalField(max_digits=16, decimal_places=2, verbose_name="Рыночная стоимость")
     # market_date = models.DateField(verbose_name="Дата оценки рыночной стоимости", null=True, blank=True)
