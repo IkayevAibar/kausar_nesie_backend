@@ -95,6 +95,10 @@ class IndividualClientSerializer(serializers.ModelSerializer):
         # Валидация даты рождения, чтобы не была в будущем
         if value > timezone.now().date():
             raise serializers.ValidationError("Дата рождения не может быть в будущем.")
+        
+        if value.year < 1900:
+            raise serializers.ValidationError("Дата рождения не может быть раньше 1900 года.")
+        
         return value
 
     def validate_rnn(self, value):
