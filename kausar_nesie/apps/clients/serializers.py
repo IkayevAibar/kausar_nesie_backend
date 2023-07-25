@@ -297,6 +297,14 @@ class DocsSerializer(serializers.ModelSerializer):
 class ContactSerializer(serializers.ModelSerializer):
     """Контакты"""
 
+    def validate_value(self, value):
+        """
+        Валидация поля value: проверяем, что поле не пустое.
+        """
+        if not value.strip():
+            raise serializers.ValidationError("Поле 'Значение' не может быть пустым.")
+        return re.sub(r'\D', '', value)
+
     class Meta:
         model = Contact
         fields = "__all__"

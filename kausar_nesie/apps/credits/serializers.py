@@ -13,7 +13,6 @@ class CreditSerializer(serializers.ModelSerializer):
         model = Credit
         fields = "__all__"
 
-
 class CreditGetSerializer(serializers.ModelSerializer):
     """Credit Retrieve/List"""
     client = ClientSerializer()
