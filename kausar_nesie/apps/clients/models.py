@@ -102,10 +102,12 @@ class Address(models.Model):
     """Адреса клиента"""
     client = models.ForeignKey(Client, verbose_name="Адрес физицеского лица", on_delete=models.CASCADE, related_name='addresses')
     post_index = models.CharField(max_length=10, verbose_name="Почтовый индекс", null=True, blank=True)
+    country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True, on_delete=models.CASCADE)
     cities = models.ForeignKey('catalog.Cities', verbose_name="Город", null=True, blank=True, on_delete=models.CASCADE)
     areas = models.ForeignKey('catalog.Areas', verbose_name="Область", null=True, blank=True, on_delete=models.CASCADE)
     district = models.ForeignKey('catalog.District', verbose_name="Район города", blank=True, null=False, on_delete=models.CASCADE)
     street = models.ForeignKey('catalog.Street', verbose_name="Улица", blank=True, null=True, on_delete=models.CASCADE)
+    housing = models.CharField(max_length=255, verbose_name="Корпус", blank=True, null=True)
     house = models.CharField(max_length=255, verbose_name="Дом", blank=True, null=False)
     flat = models.CharField(max_length=255, verbose_name="Квартира", blank=True, null=True)
     addr_type = models.ForeignKey('catalog.AddressType', verbose_name="Тип адреса", on_delete=models.CASCADE,
