@@ -767,6 +767,7 @@ class CreditViewSet(viewsets.ModelViewSet):
                     payment_schedule.status = PaymentStatus.objects.get(id=1)
                     payment_schedule.penalty_commission = 0
                     payment_schedule.not_paid_amount = 0
+                    payment_schedule.date_get_payment = None
                     payment_schedule.save()
                 except:
                     pass 
@@ -787,6 +788,15 @@ class CreditViewSet(viewsets.ModelViewSet):
         return result
     
     @staticmethod
+    def get_account_balance(self, client):
+        try:
+            account = Account.objects.get(client=client)
+        except:
+            return -1
+        
+        return account.amount
+
+    @staticmethod
     def charge_account(self, client, amount):
         try:
             account = Account.objects.get(client=client)
@@ -802,29 +812,22 @@ class CreditViewSet(viewsets.ModelViewSet):
         try:
             account = Account.objects.get(client=client)
         except:
-            print("status:2")
             return 2
         
-        print(account.amount, amount)
         if(account.amount >= amount):
             try:
                 account.amount -= int(amount)
             except:
-                print("status:3")
                 return 3
         else:
-            print("status:4")
             return 4
         account.save()
-        # 
         
-        print("status:1")
         return 1
 
     @action(detail=True, methods=['get'])
     def payment(self, request, pk=None):
         credit = self.get_object()
-        payment_amount = request.query_params.get('payment_amount')
         payment_number = request.query_params.get('payment_number')
 
         try:
@@ -832,13 +835,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         except:
             return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)  
           
-        if(payment_amount == None):
-            return Response({"error": "payment_amount is required"}, status=status.HTTP_400_BAD_REQUEST)
         
         if(payment_number == None):
             return Response({"error": "payment_number is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        payment_amount = float(payment_amount)
         
         try:
             credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number)
@@ -848,71 +848,42 @@ class CreditViewSet(viewsets.ModelViewSet):
         if(credit_payment_schedule.status.id != 1):
             return Response({"error": "Уже оплачено клиентом"}, status=status.HTTP_400_BAD_REQUEST)
         
-        credit_payment_schedule.amount = payment_amount
 
-        if(payment_amount < credit_payment_schedule.total_payment):
+        balance = self.get_account_balance(self, credit.client)
 
-            self.charge_account(self, credit.client, payment_amount)
+        if(balance == -1):
+            return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if(balance == 0):
+            return Response({"error": "На счёте клиента нет средств"}, status=status.HTTP_400_BAD_REQUEST)
 
-            account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.total_payment)
-            
+        if(balance < credit_payment_schedule.total_payment):
+            account_action_status = self.discharge_account(self, credit.client, balance)
+
             if(account_action_status == 2):
                 return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if(account_action_status == 4 or account_action_status == 3):
-                account_action_status_ = self.discharge_account(self, credit.client, payment_amount)
 
-                credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
-                credit_payment_schedule.not_paid_amount = credit_payment_schedule.total_payment - int(payment_amount)
-                
-                next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=int(payment_number)+1)
-                next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - int(payment_amount)
-                next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - int(payment_amount)
+            credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
+            credit_payment_schedule.not_paid_amount = credit_payment_schedule.total_payment - int(balance)
+            credit_payment_schedule.amount = balance
+            credit_payment_schedule.date_get_payment = datetime.datetime.now()
+            
+            next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=int(payment_number)+1)
+            next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - int(balance)
+            next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - int(balance)
 
-                credit_payment_schedule.save()
-                next_credit_payment_schedule.save()
-            else:
-                credit_payment_schedule.status = PaymentStatus.objects.get(id=2)
-                credit_payment_schedule.save()
-            
-        #150000 50000
-        if(payment_amount > credit_payment_schedule.total_payment):
-            if(credit_payment_schedule.total_payment*3<payment_amount):
-                return Response({"error": "payment_amount превосходит 3-х месячную оплату"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            self.charge_account(self, credit.client, payment_amount)
-
-            account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.total_payment)
-            
-            if(account_action_status == 2):
-                return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if(account_action_status == 4):
-                return Response({"error": "Не достаточно баланса на счёте клиента"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # self.charge_account(self, credit.client, payment_amount - float(credit_payment_schedule.total_payment))
-
-
-            # next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=payment_number+1)
-            # next_credit_payment_schedule.amount = payment_amount - next_credit_payment_schedule.total_payment
-            # next_credit_payment_schedule.save()
-            
-            credit_payment_schedule.status = PaymentStatus.objects.get(id=4)
             credit_payment_schedule.save()
-
-            # self.update_payment_schedule(self, payment_amount, payment_number, credit.id)
+            next_credit_payment_schedule.save()
             
-
-        if(payment_amount == credit_payment_schedule.total_payment):
-            account_action_status = self.discharge_account(self, credit.client, payment_amount)
+        else:
+            account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.total_payment)
             
             if(account_action_status == 2):
                 return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if(account_action_status == 4):
-                return Response({"error": "Не достаточно баланса на счёте клиента"}, status=status.HTTP_400_BAD_REQUEST)
             
             credit_payment_schedule.status = PaymentStatus.objects.get(id=2)
+            credit_payment_schedule.date_get_payment = datetime.datetime.now()
+            credit_payment_schedule.amount = credit_payment_schedule.total_payment
             credit_payment_schedule.save()
             
         
