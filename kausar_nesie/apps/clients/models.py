@@ -66,7 +66,8 @@ class Client(models.Model):
                             on_delete=models.SET_NULL, blank=True, null=True)
     insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)
     individual_client = models.OneToOneField(IndividualClient, on_delete=models.CASCADE, null=True, blank=True)
-    
+    category_type = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
+                                     on_delete=models.CASCADE)
     def __str__(self):
         if(self.individual_client):
             return f"{self.individual_client.full_name}"
@@ -83,11 +84,9 @@ class Docs(models.Model):
                              on_delete=models.CASCADE,
                              blank=True, null=True)
     number = models.CharField(max_length=255, verbose_name="Номер", blank=True)
-    series = models.CharField(max_length=255, verbose_name="Серия", blank=True)
     start_date = models.DateField(verbose_name="Дата начала", blank=True, default=timezone.now)
     end_date = models.DateField(verbose_name="Дата окончания", blank=True, default=timezone.now)
     issued_by = models.CharField(max_length=255, verbose_name="Кем выдан", blank=True)
-    scan = models.FileField(upload_to='docs/', verbose_name="Сканированная копия документа", null=False, blank=False)
     def __str__(self):
         return f"{self.number}"
 

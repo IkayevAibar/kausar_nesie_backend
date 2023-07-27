@@ -56,6 +56,28 @@ class ClientViewSet(viewsets.ModelViewSet):
         # Instead of returning the full serialized data, return only the 'id' field
         return Response({'client_id': serializer.instance.id}, status=status.HTTP_201_CREATED)
     
+    @action(detail=True, methods=['post'])
+    def add_balance_to_account(self, request, pk=None):
+        client = self.get_object()
+
+        try:
+            amount = request.data['amount']
+        except KeyError:
+            return Response({'error': 'amount не указан'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            account = Account.objects.get(client=client)
+        except Account.DoesNotExist:
+            return Response({'error': 'Счёт Клиента не найден'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            account.amount += int(amount)
+            account.save()
+        except ValueError:
+            return Response({'error': 'Транзакция не удалась'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'success': 'Транзакция прошла успешно'}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'])
     def search_individual_client(self, request):
         query = request.GET.get('query')

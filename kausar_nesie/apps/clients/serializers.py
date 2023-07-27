@@ -9,6 +9,7 @@ from apps.catalog.serializers import *
 import re
 import datetime
 
+
 class AddressSerializer(serializers.ModelSerializer):
     """Адреса клиента"""
 
@@ -250,11 +251,9 @@ class DocsSerializer(serializers.ModelSerializer):
         """
         Валидация поля series: проверяем, что серия документа не пустая.
         """
-        if not value.strip():
-            raise serializers.ValidationError("Серия документа не может быть пустой.")
-        
-        if not re.match(r'^[a-zA-Z0-9]+$', value):
-            raise serializers.ValidationError("Серия документа может содержать только буквы и цифры.")
+        if value.strip():
+            if not re.match(r'^[a-zA-Z0-9]+$', value):
+                raise serializers.ValidationError("Серия документа может содержать только буквы и цифры.")
         
         return value
 
@@ -295,7 +294,6 @@ class DocsSerializer(serializers.ModelSerializer):
 
         return value
 
-        return re.sub(r'\D', '', value)
     class Meta:
         model = Docs
         fields = "__all__"

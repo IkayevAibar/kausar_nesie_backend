@@ -9,9 +9,9 @@ class IndividualClientAdmin(admin.ModelAdmin):
     search_fields = ('full_name', 'rnn', 'iin', 'sic')
 
 class DocsAdmin(admin.ModelAdmin):
-    list_display = ('client', 'identity_card_type', 'number', 'series', 'start_date', 'end_date', 'issued_by')
+    list_display = ('client', 'identity_card_type', 'number', 'start_date', 'end_date', 'issued_by')
     list_filter = ('identity_card_type', )
-    search_fields = ('number', 'series', 'series', 'client')
+    search_fields = ('number', 'client')
 
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ('short_name', 'full_name', 'sector', 'org_form', 'form_property', 'okpo', 'reg_num', 'reg_date', 'reg_org', 'certify_ser', 'certify_num')

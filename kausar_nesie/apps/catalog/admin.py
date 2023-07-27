@@ -26,8 +26,8 @@ class StreetAdmin(admin.ModelAdmin):
     list_filter = ('district',)
 
 class CategoryTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'provision_prc', 'provision_from', 'provision_to', 'delay_days_to', 'delay_days_from')
-    search_fields = ('name',  'code', 'provision_prc', 'provision_from', 'provision_to', 'delay_days_to', 'delay_days_from')
+    list_display = ('name', 'code', 'provision_prc', 'provision_to', 'provision_from', 'delay_days_to', 'delay_days_from')
+    search_fields = ('name',  'code', 'provision_prc', 'provision_to', 'provision_from', 'delay_days_to', 'delay_days_from')
 
 class TransactionTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'num_pattern')
