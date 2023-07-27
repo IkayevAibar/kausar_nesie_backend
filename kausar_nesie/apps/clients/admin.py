@@ -4,9 +4,9 @@ from .models import *
 # Register your models here.
 
 class IndividualClientAdmin(admin.ModelAdmin):
-    list_display = ('reg_number', 'name', 'surname', 'middle_name', 'gender', 'date_of_birth', 'place_of_birth', 'rnn', 'iin', 'sic', 'is_resident', 'country', 'client_category')
+    list_display = ('reg_number', 'full_name', 'gender', 'date_of_birth', 'place_of_birth', 'rnn', 'iin', 'sic', 'is_resident', 'country', 'client_category')
     list_filter = ('client_category', 'country', 'is_resident', 'place_of_birth', 'gender')
-    search_fields = ('name', 'surname', 'middle_name', 'rnn', 'iin', 'sic')
+    search_fields = ('full_name', 'rnn', 'iin', 'sic')
 
 class DocsAdmin(admin.ModelAdmin):
     list_display = ('client', 'identity_card_type', 'number', 'series', 'start_date', 'end_date', 'issued_by')

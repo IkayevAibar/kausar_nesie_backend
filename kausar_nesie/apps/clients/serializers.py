@@ -60,37 +60,16 @@ class IndividualClientSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Номер регистрации не может быть пустым.")
         return value
 
-    def validate_name(self, value):
+    def validate_full_name(self, value):
         """
-        Валидация поля name: проверяем, что имя содержит только буквы и дефисы, если указано.
-        """
-        if not value:
-            raise serializers.ValidationError("Поле 'Имя' обязательно.")
-        if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
-            raise serializers.ValidationError("Поле 'Имя' должно содержать только буквы и дефисы.")
-        return value
-
-    def validate_surname(self, value):
-        """
-        Валидация поля surname: проверяем, что фамилия содержит только буквы и дефисы, если указана.
+        Валидация поля full_name: проверяем, что имя содержит только буквы и дефисы, если указано.
         """
         if not value:
-            raise serializers.ValidationError("Поле 'Фамилия' обязательно.")
+            raise serializers.ValidationError("Поле 'full_name' обязательно.")
         if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
-            raise serializers.ValidationError("Поле 'Фамилия' должно содержать только буквы и дефисы.")
+            raise serializers.ValidationError("Поле 'full_name' должно содержать только буквы и дефисы.")
         return value
 
-    def validate_middle_name(self, value):
-        """
-        Валидация поля middle_name: проверяем, что отчество содержит только буквы и дефисы, если указано.
-        """
-        if value is None:
-            return value  # Разрешаем значение None (null=True)
-
-        if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
-            raise serializers.ValidationError("Поле 'Отчество' должно содержать только буквы и дефисы.")
-        return value
-    
     def validate_date_of_birth(self, value):
         # Валидация даты рождения, чтобы не была в будущем
         if value > timezone.now().date():

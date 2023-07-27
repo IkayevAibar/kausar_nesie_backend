@@ -11,6 +11,7 @@ class AreasViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Areas.objects.all()
     serializer_class = AreasSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class AddressTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -18,6 +19,7 @@ class AddressTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AddressType.objects.all()
     serializer_class = AddressTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -27,6 +29,7 @@ class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['area']
+    pagination_class = None
 
 class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Районы"""
@@ -35,6 +38,7 @@ class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['city']
+    pagination_class = None
 
 class StreetViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Улицы"""
@@ -43,6 +47,7 @@ class StreetViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['district']
+    pagination_class = None
 
 class ClientCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Категории клиентов"""
@@ -57,6 +62,7 @@ class CategoryTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CategoryType.objects.all()
     serializer_class = CategoryTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class WorkTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -64,6 +70,7 @@ class WorkTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = WorkType.objects.all()
     serializer_class = WorkTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class TransactionTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -71,6 +78,7 @@ class TransactionTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = TransactionType.objects.all()
     serializer_class = TransactionTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class StatusViewSet(viewsets.ReadOnlyModelViewSet):
@@ -78,6 +86,7 @@ class StatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class SectorEconViewSet(viewsets.ReadOnlyModelViewSet):
@@ -85,6 +94,7 @@ class SectorEconViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SectorEcon.objects.all()
     serializer_class = SectorEconSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class ProjectTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -92,6 +102,7 @@ class ProjectTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ProjectType.objects.all()
     serializer_class = ProjectTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class PositionTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -99,6 +110,7 @@ class PositionTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PositionType.objects.all()
     serializer_class = PositionTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class PeriodTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -106,6 +118,7 @@ class PeriodTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PeriodType.objects.all()
     serializer_class = PeriodTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class PaymentTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -113,6 +126,7 @@ class PaymentTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PaymentType.objects.all()
     serializer_class = PaymentTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class OrgFormViewSet(viewsets.ReadOnlyModelViewSet):
@@ -120,6 +134,7 @@ class OrgFormViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = OrgForm.objects.all()
     serializer_class = OrgFormSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class LinkTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -127,6 +142,7 @@ class LinkTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = LinkType.objects.all()
     serializer_class = LinkTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class LineTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -134,12 +150,14 @@ class LineTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = LineType.objects.all()
     serializer_class = LineTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class IdCardViewSet(viewsets.ReadOnlyModelViewSet):
     """Документы удостоверющие данные клиента"""
     queryset = IdcardType.objects.all()
     serializer_class = IdcardTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class FormPropertyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -147,6 +165,7 @@ class FormPropertyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FormProperty.objects.all()
     serializer_class = FormPropertySerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CurrenciesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -154,12 +173,14 @@ class CurrenciesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Currencies.objects.all()
     serializer_class = CurrenciesSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class CreditTargetViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Цели кредитования"""
     queryset = CreditTarget.objects.all()
     serializer_class = CreditTargetSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CreditSourceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -167,6 +188,7 @@ class CreditSourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CreditSource.objects.all()
     serializer_class = CreditSourceSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CountryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -174,6 +196,7 @@ class CountryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CountersViewSet(viewsets.ReadOnlyModelViewSet):
@@ -181,6 +204,7 @@ class CountersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Counters.objects.all()
     serializer_class = CountersSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class ContactTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -188,6 +212,7 @@ class ContactTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ContactType.objects.all()
     serializer_class = ContactTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CollateralTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -195,12 +220,14 @@ class CollateralTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CollateralType.objects.all()
     serializer_class = CollateralTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class DeptTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Виды задолженностей"""
     queryset = DeptType.objects.all()
     serializer_class = DeptTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class BankViewSet(viewsets.ReadOnlyModelViewSet):
@@ -208,6 +235,7 @@ class BankViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Bank.objects.all()
     serializer_class = BankSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class CalculateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -215,6 +243,7 @@ class CalculateViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Calculate.objects.all()
     serializer_class = CalculateSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class BaseAccountViewSet(viewsets.ReadOnlyModelViewSet):
@@ -222,48 +251,56 @@ class BaseAccountViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = BaseAccount.objects.all()
     serializer_class = BaseAccountSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class AccountPatternViewSet(viewsets.ReadOnlyModelViewSet):
     """Шаблоны номеров счетов"""
     queryset = AccountPattern.objects.all()
     serializer_class = AccountPatternSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class AccountTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы счетов"""
     queryset = AccountType.objects.all()
     serializer_class = AccountTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class DepartamentViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Отделы"""
     queryset = Departament.objects.all()
     serializer_class = DepartamentSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class PaymentRuleViewSet(viewsets.ReadOnlyModelViewSet):
     """Правила гашения"""
     queryset = PaymentRule.objects.all()
     serializer_class = PaymentRuleSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class CreditTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы кредитов"""
     queryset = CreditType.objects.all()
     serializer_class = CreditTypeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class InterestSchemeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Схемы начисления процентов"""
     queryset = InterestScheme.objects.all()
     serializer_class = InterestSchemeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class InterestRateViewSet(viewsets.ReadOnlyModelViewSet):
     """Ставки. Схемы начисления процентов"""
     queryset = InterestRate.objects.all()
     serializer_class = InterestRateSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class InterestJournalViewSet(viewsets.ReadOnlyModelViewSet):
@@ -271,6 +308,7 @@ class InterestJournalViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = InterestJournal.objects.all()
     serializer_class = InterestJournalSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class InsuranceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -278,10 +316,12 @@ class InsuranceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Insurance.objects.all()
     serializer_class = InsuranceSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 class InsuranceLinkViewSet(viewsets.ReadOnlyModelViewSet):
     """Связь с договорами страхования"""
     queryset = InsuranceLink.objects.all()
     serializer_class = InsuranceLinkSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 

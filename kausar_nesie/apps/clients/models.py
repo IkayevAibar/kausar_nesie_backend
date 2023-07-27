@@ -15,9 +15,7 @@ class IndividualClient(models.Model):
     )
 
     reg_number = models.CharField(max_length=255, unique=True, verbose_name="Номер peг.", blank=True, null=False)
-    name = models.CharField(max_length=255, verbose_name="Имя", blank=True, null=False)
-    surname = models.CharField(max_length=255, verbose_name="Фамилия", blank=True, null=False)
-    middle_name = models.CharField(max_length=255, verbose_name="Отчество", blank=True, null=True)
+    full_name = models.CharField(max_length=255, verbose_name="Полное имя", blank=True, null=False)
     gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=False, blank=False, verbose_name=("Пол"))
     date_of_birth = models.DateField(verbose_name="Дата рождения", null=False, blank=True, default=timezone.now)
     place_of_birth = models.ForeignKey('catalog.Areas', verbose_name="Место рождения", null=False, blank=False, on_delete=models.CASCADE)

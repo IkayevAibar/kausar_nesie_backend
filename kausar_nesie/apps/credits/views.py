@@ -910,7 +910,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             if(credit_payment_schedule.date_to_payment < payment_date):
 
                 next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=int(payment_number)+1)
-                next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - int(balance)
+                next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - int(balance) + credit_payment_schedule.penalty_commission
                 next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - int(balance)
                 credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
                 

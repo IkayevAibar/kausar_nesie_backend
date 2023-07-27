@@ -43,9 +43,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__name', '=individual_client__name', \
-        'individual_client__name', '^individual_client__surname', '=individual_client__surname', 'individual_client__surname', \
-            '^individual_client__middle_name', '=individual_client__middle_name', 'individual_client__middle_name']
+    search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
+        'individual_client__full_name',]
     filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
         'individual_client__client_category']
 
@@ -54,8 +53,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         query = request.GET.get('query')
         if query:
             clients = self.filter_queryset(self.get_queryset()).filter(
-                Q(individual_client__name__icontains=query) |
-                Q(individual_client__surname__icontains=query)
+                Q(individual_client__full_name__icontains=query) 
             ).distinct()
         else:
             clients = self.filter_queryset(self.get_queryset())
