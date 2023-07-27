@@ -446,7 +446,7 @@ class CreditViewSet(viewsets.ModelViewSet):
                 cps.principal_payment = new_principal_payment
                 cps.total_payment = payment_amount
                 cps.principal_remaining = float(prev_cps.principal_remaining) - new_principal_payment
-                cps.status = PaymentStatus.objects.get(id=1)
+                cps.status = PaymentStatus.objects.get(id=2)
                 # print(payment_amount, new_principal_payment, new_commission_payment, float(prev_cps.principal_remaining) - new_principal_payment)
                 cps.save()
 
@@ -562,7 +562,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         cps.principal_payment= pp
         cps.total_payment = float(new_first_payment_amount)
         cps.principal_remaining = prev_principal_remaining - pp
-        cps.status = PaymentStatus.objects.get(id=1)
+        cps.status = PaymentStatus.objects.get(id=2)
         cps.save()
 
         cpss = CreditPaymentSchedule.objects.filter(credit=credit, number__gte=int(number)+1).order_by('number')
