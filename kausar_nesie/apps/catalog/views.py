@@ -6,21 +6,21 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import *
 
-class AreasViewSet(viewsets.ModelViewSet):
+class AreasViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Области"""
     queryset = Areas.objects.all()
     serializer_class = AreasSerializer
     permission_classes = [AllowAny]
 
 
-class AddressTypeViewSet(viewsets.ModelViewSet):
+class AddressTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы адресов"""
     queryset = AddressType.objects.all()
     serializer_class = AddressTypeSerializer
     permission_classes = [AllowAny]
 
 
-class CitiesViewSet(viewsets.ModelViewSet):
+class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Населенные пункты"""
     queryset = Cities.objects.all()
     serializer_class = CitiesSerializer
@@ -28,7 +28,7 @@ class CitiesViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['area']
 
-class DistrictViewSet(viewsets.ModelViewSet):
+class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Районы"""
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
@@ -36,7 +36,7 @@ class DistrictViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['city']
 
-class StreetViewSet(viewsets.ModelViewSet):
+class StreetViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Улицы"""
     queryset = Street.objects.all()
     serializer_class = StreetSerializer
@@ -44,241 +44,242 @@ class StreetViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['district']
 
-class ClientCategoryViewSet(viewsets.ModelViewSet):
+class ClientCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Категории клиентов"""
     queryset = ClientCategory.objects.all()
     serializer_class = ClientCategorySerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
-class CategoryTypeViewSet(viewsets.ModelViewSet):
+class CategoryTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Виды категорий качества"""
     queryset = CategoryType.objects.all()
     serializer_class = CategoryTypeSerializer
     permission_classes = [AllowAny]
 
 
-class WorkTypeViewSet(viewsets.ModelViewSet):
+class WorkTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Тип занятости"""
     queryset = WorkType.objects.all()
     serializer_class = WorkTypeSerializer
     permission_classes = [AllowAny]
 
 
-class TransactionTypeViewSet(viewsets.ModelViewSet):
+class TransactionTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы транзакций"""
     queryset = TransactionType.objects.all()
     serializer_class = TransactionTypeSerializer
     permission_classes = [AllowAny]
 
 
-class StatusViewSet(viewsets.ModelViewSet):
+class StatusViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Статусы"""
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
     permission_classes = [AllowAny]
 
 
-class SectorEconViewSet(viewsets.ModelViewSet):
+class SectorEconViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Сектора экономики"""
     queryset = SectorEcon.objects.all()
     serializer_class = SectorEconSerializer
     permission_classes = [AllowAny]
 
 
-class ProjectTypeViewSet(viewsets.ModelViewSet):
+class ProjectTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы проектов"""
     queryset = ProjectType.objects.all()
     serializer_class = ProjectTypeSerializer
     permission_classes = [AllowAny]
 
 
-class PositionTypeViewSet(viewsets.ModelViewSet):
+class PositionTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Тип должности"""
     queryset = PositionType.objects.all()
     serializer_class = PositionTypeSerializer
     permission_classes = [AllowAny]
 
 
-class PeriodTypeViewSet(viewsets.ModelViewSet):
+class PeriodTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы периодов"""
     queryset = PeriodType.objects.all()
     serializer_class = PeriodTypeSerializer
     permission_classes = [AllowAny]
 
 
-class PaymentTypeViewSet(viewsets.ModelViewSet):
+class PaymentTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. КНП"""
     queryset = PaymentType.objects.all()
     serializer_class = PaymentTypeSerializer
     permission_classes = [AllowAny]
 
 
-class OrgFormViewSet(viewsets.ModelViewSet):
+class OrgFormViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Форма предприятия"""
     queryset = OrgForm.objects.all()
     serializer_class = OrgFormSerializer
     permission_classes = [AllowAny]
 
 
-class LinkTypeViewSet(viewsets.ModelViewSet):
+class LinkTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы связи договоров"""
     queryset = LinkType.objects.all()
     serializer_class = LinkTypeSerializer
     permission_classes = [AllowAny]
 
 
-class LineTypeViewSet(viewsets.ModelViewSet):
+class LineTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы связи линий"""
     queryset = LineType.objects.all()
     serializer_class = LineTypeSerializer
     permission_classes = [AllowAny]
 
-class IdCardViewSet(viewsets.ModelViewSet):
+class IdCardViewSet(viewsets.ReadOnlyModelViewSet):
     """Документы удостоверющие данные клиента"""
     queryset = IdcardType.objects.all()
     serializer_class = IdcardTypeSerializer
     permission_classes = [AllowAny]
 
 
-class FormPropertyViewSet(viewsets.ModelViewSet):
+class FormPropertyViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Форма собственности"""
     queryset = FormProperty.objects.all()
     serializer_class = FormPropertySerializer
     permission_classes = [AllowAny]
 
 
-class CurrenciesViewSet(viewsets.ModelViewSet):
+class CurrenciesViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Валюты"""
     queryset = Currencies.objects.all()
     serializer_class = CurrenciesSerializer
     permission_classes = [AllowAny]
 
-class CreditTargetViewSet(viewsets.ModelViewSet):
+class CreditTargetViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Цели кредитования"""
     queryset = CreditTarget.objects.all()
     serializer_class = CreditTargetSerializer
     permission_classes = [AllowAny]
 
 
-class CreditSourceViewSet(viewsets.ModelViewSet):
+class CreditSourceViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Источник кредитования"""
     queryset = CreditSource.objects.all()
     serializer_class = CreditSourceSerializer
     permission_classes = [AllowAny]
 
 
-class CountryViewSet(viewsets.ModelViewSet):
+class CountryViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Государства"""
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
     permission_classes = [AllowAny]
 
 
-class CountersViewSet(viewsets.ModelViewSet):
+class CountersViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Счетчики"""
     queryset = Counters.objects.all()
     serializer_class = CountersSerializer
     permission_classes = [AllowAny]
 
 
-class ContactTypeViewSet(viewsets.ModelViewSet):
+class ContactTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы контактов"""
     queryset = ContactType.objects.all()
     serializer_class = ContactTypeSerializer
     permission_classes = [AllowAny]
 
 
-class CollateralTypeViewSet(viewsets.ModelViewSet):
+class CollateralTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы залога"""
     queryset = CollateralType.objects.all()
     serializer_class = CollateralTypeSerializer
     permission_classes = [AllowAny]
 
-class DeptTypeViewSet(viewsets.ModelViewSet):
+class DeptTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Виды задолженностей"""
     queryset = DeptType.objects.all()
     serializer_class = DeptTypeSerializer
     permission_classes = [AllowAny]
 
 
-class BankViewSet(viewsets.ModelViewSet):
+class BankViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Банки"""
     queryset = Bank.objects.all()
     serializer_class = BankSerializer
     permission_classes = [AllowAny]
 
 
-class CalculateViewSet(viewsets.ModelViewSet):
+class CalculateViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Тип расчета"""
     queryset = Calculate.objects.all()
     serializer_class = CalculateSerializer
     permission_classes = [AllowAny]
 
 
-class BaseAccountViewSet(viewsets.ModelViewSet):
+class BaseAccountViewSet(viewsets.ReadOnlyModelViewSet):
     """План счетов"""
     queryset = BaseAccount.objects.all()
     serializer_class = BaseAccountSerializer
     permission_classes = [AllowAny]
 
-class AccountPatternViewSet(viewsets.ModelViewSet):
+class AccountPatternViewSet(viewsets.ReadOnlyModelViewSet):
     """Шаблоны номеров счетов"""
     queryset = AccountPattern.objects.all()
     serializer_class = AccountPatternSerializer
     permission_classes = [AllowAny]
 
-class AccountTypeViewSet(viewsets.ModelViewSet):
+class AccountTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы счетов"""
     queryset = AccountType.objects.all()
     serializer_class = AccountTypeSerializer
     permission_classes = [AllowAny]
 
-class DepartamentViewSet(viewsets.ModelViewSet):
+class DepartamentViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Отделы"""
     queryset = Departament.objects.all()
     serializer_class = DepartamentSerializer
     permission_classes = [AllowAny]
 
-class PaymentRuleViewSet(viewsets.ModelViewSet):
+class PaymentRuleViewSet(viewsets.ReadOnlyModelViewSet):
     """Правила гашения"""
     queryset = PaymentRule.objects.all()
     serializer_class = PaymentRuleSerializer
     permission_classes = [AllowAny]
 
-class CreditTypeViewSet(viewsets.ModelViewSet):
+class CreditTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Типы кредитов"""
     queryset = CreditType.objects.all()
     serializer_class = CreditTypeSerializer
     permission_classes = [AllowAny]
 
-class InterestSchemeViewSet(viewsets.ModelViewSet):
+class InterestSchemeViewSet(viewsets.ReadOnlyModelViewSet):
     """Справочник. Схемы начисления процентов"""
     queryset = InterestScheme.objects.all()
     serializer_class = InterestSchemeSerializer
     permission_classes = [AllowAny]
 
-class InterestRateViewSet(viewsets.ModelViewSet):
+class InterestRateViewSet(viewsets.ReadOnlyModelViewSet):
     """Ставки. Схемы начисления процентов"""
     queryset = InterestRate.objects.all()
     serializer_class = InterestRateSerializer
     permission_classes = [AllowAny]
 
 
-class InterestJournalViewSet(viewsets.ModelViewSet):
+class InterestJournalViewSet(viewsets.ReadOnlyModelViewSet):
     """Журнал начисленных процентов"""
     queryset = InterestJournal.objects.all()
     serializer_class = InterestJournalSerializer
     permission_classes = [AllowAny]
 
 
-class InsuranceViewSet(viewsets.ModelViewSet):
+class InsuranceViewSet(viewsets.ReadOnlyModelViewSet):
     """Договора страхования"""
     queryset = Insurance.objects.all()
     serializer_class = InsuranceSerializer
     permission_classes = [AllowAny]
 
-class InsuranceLinkViewSet(viewsets.ModelViewSet):
+class InsuranceLinkViewSet(viewsets.ReadOnlyModelViewSet):
     """Связь с договорами страхования"""
     queryset = InsuranceLink.objects.all()
     serializer_class = InsuranceLinkSerializer
