@@ -37,7 +37,6 @@ class CreditViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filterset_class = CreditFilter
     filter_backends = [DjangoFilterBackend,] #filters.SearchFilter]
-    # search_fields = ['notes', 'num_dog', 'period_count', 'reason', 'client__individual_client__name', 'client__individual_client__surname'] 
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':

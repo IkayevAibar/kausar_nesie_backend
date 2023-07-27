@@ -28,7 +28,7 @@ class IndividualClient(models.Model):
                                       on_delete=models.SET_NULL)
     
     def __str__(self):
-        return f"{self.surname} {self.name} {self.middle_name}"
+        return f"{self.full_name}"
 
     class Meta:
         verbose_name = "Физическое лицо"
@@ -69,7 +69,7 @@ class Client(models.Model):
     
     def __str__(self):
         if(self.individual_client):
-            return f"{self.individual_client.name} {self.individual_client.surname} {self.individual_client.middle_name}"
+            return f"{self.individual_client.full_name}"
         return f"{self.id}"
 
     class Meta:
