@@ -349,6 +349,10 @@ class IndividualClientRetrieveSerializer(serializers.ModelSerializer):
         model = IndividualClient
         fields = "__all__"
     
+class ClientAddBalanceToAccountSerializer(serializers.Serializer):
+    """Пополнение счета клиента"""
+    amount = serializers.CharField(required=True)
+
 
 class ClientRetrieveSerializer(serializers.ModelSerializer):
     """Клиенты"""

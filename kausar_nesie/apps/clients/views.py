@@ -118,6 +118,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve', 'search_company_client', 'search_individual_client']:
             return ClientRetrieveSerializer
+        if self.action == 'add_balance_to_account':
+            return ClientAddBalanceToAccountSerializer
         return self.serializer_class
     
     @action(detail=False, methods=['get'])
