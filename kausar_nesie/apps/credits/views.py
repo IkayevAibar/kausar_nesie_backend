@@ -859,7 +859,7 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         credit_payment_schedule.save()
         
-        return Response({"success": "Успешно пересчитана сумма оплата"}, status=status.HTTP_200_OK)
+        return Response({"success": "Успешно пересчитана сумма оплата", "days": days}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def payment(self, request, pk=None):
