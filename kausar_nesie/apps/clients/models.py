@@ -66,7 +66,7 @@ class Client(models.Model):
                             on_delete=models.SET_NULL, blank=True, null=True)
     insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)
     individual_client = models.OneToOneField(IndividualClient, on_delete=models.CASCADE, null=True, blank=True)
-    category_type = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
+    category_type = models.ForeignKey('catalog.CategoryType', verbose_name="Категория клиента", null=True, blank=True,
                                      on_delete=models.CASCADE)
     def __str__(self):
         if(self.individual_client):
