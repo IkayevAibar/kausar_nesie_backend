@@ -48,6 +48,14 @@ class ClientViewSet(viewsets.ModelViewSet):
     filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
         'individual_client__client_category']
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Instead of returning the full serialized data, return only the 'id' field
+        return Response({'client_id': serializer.instance.id}, status=status.HTTP_201_CREATED)
+    
     @action(detail=False, methods=['get'])
     def search_individual_client(self, request):
         query = request.GET.get('query')
