@@ -93,7 +93,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         return self.serializer_class
     
     @action(detail=False, methods=['get'])
-    def get_last_num_reg(self):
+    def get_last_num_reg(self, request):
         last_client = Client.objects.last()
         if last_client:
             value = last_client.id
