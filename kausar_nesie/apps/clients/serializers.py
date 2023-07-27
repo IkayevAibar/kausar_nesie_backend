@@ -383,6 +383,30 @@ class ClientSerializer(serializers.ModelSerializer):
         client = Client.objects.create(**validated_data)
 
         return client
+    
+    def update(self, instance, validated_data):
+        individual_client_data = validated_data.pop('individual_client', None)
+
+        reg_number = individual_client_data.get('reg_number', instance.individual_client.reg_number)
+
+        if reg_number != instance.individual_client.reg_number:
+            instance.individual_client.reg_number = reg_number
+        
+        
+        instance.individual_client.full_name = individual_client_data.get('full_name', instance.individual_client.full_name)
+        instance.individual_client.gender = individual_client_data.get('gender', instance.individual_client.gender)
+        instance.individual_client.iin = individual_client_data.get('iin', instance.individual_client.iin)
+        instance.individual_client.rnn = individual_client_data.get('rnn', instance.individual_client.iin)
+        instance.individual_client.sic = individual_client_data.get('sic', instance.individual_client.iin)
+        instance.individual_client.date_of_birth = individual_client_data.get('date_of_birth', instance.individual_client.date_of_birth)
+        instance.individual_client.place_of_birth = individual_client_data.get('place_of_birth', instance.individual_client.place_of_birth)
+        instance.individual_client.country = individual_client_data.get('country', instance.individual_client.country)
+        instance.individual_client.client_category = individual_client_data.get('client_category', instance.individual_client.client_category)
+        try:
+            instance.individual_client.save()
+        except Exception as e:
+            raise serializers.ValidationError({"error":"Данные для физ лица некорректны", "error_message": e})
+        return instance
 
 
 class CompanyRetrieveSerializer(serializers.ModelSerializer):
