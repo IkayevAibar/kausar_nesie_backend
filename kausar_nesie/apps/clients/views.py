@@ -91,6 +91,15 @@ class ClientViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve', 'search_company_client', 'search_individual_client']:
             return ClientRetrieveSerializer
         return self.serializer_class
+    
+    @action(detail=False, methods=['get'])
+    def get_last_num_reg(self):
+        last_client = Client.objects.last()
+        if last_client:
+            value = last_client.id
+        else: value = 0
+
+        return Response({'last_num_reg': value})
 
 class CompanyViewSet(viewsets.ModelViewSet):
     """Юр лица"""
