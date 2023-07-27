@@ -211,7 +211,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_21 = "Республика Казахстан"
 
         field_name_22 = "_client_full_name_"
-        field_value_22 = f"{credit.client.individual_client.name} {credit.client.individual_client.surname} {credit.client.individual_client.middle_name}"
+        field_value_22 = f"{credit.client.individual_client.full_name}"
 
         field_name_23 = "_passport_number_"
         field_value_23 = f"{client_docs.number}"
@@ -919,7 +919,7 @@ class CreditViewSet(viewsets.ModelViewSet):
 
             credit_payment_schedule.save()
         else:
-            account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.total_payment)
+            account_action_status = self.discharge_account(self, credit.client, total_payment)
             
             if(account_action_status == 2):
                 return Response({"error": "Не получилось найти счёт клиента"}, status=status.HTTP_400_BAD_REQUEST)

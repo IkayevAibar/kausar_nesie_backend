@@ -66,7 +66,7 @@ class IndividualClientSerializer(serializers.ModelSerializer):
         """
         if not value:
             raise serializers.ValidationError("Поле 'full_name' обязательно.")
-        if not re.match(r'^[A-Za-zА-Яа-я-]+$', value):
+        if not re.match(r'^[A-Za-zА-Яа-я-\s]+$', value):
             raise serializers.ValidationError("Поле 'full_name' должно содержать только буквы и дефисы.")
         return value
 
@@ -82,8 +82,11 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
     def validate_rnn(self, value):
         # Валидация РНН (Регистрационный номер налогоплательщика)
-        if not value.isdigit() or len(value) != 12:
-            raise serializers.ValidationError("РНН должен состоять из 12 цифр.")
+        print("rnn:",value)
+        if(value != None and value != ""):
+            if not value.isdigit() or len(value) != 12:
+                raise serializers.ValidationError("РНН должен состоять из 12 цифр.")
+        
         return value
 
     def validate_iin(self, value):
@@ -94,8 +97,9 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
     def validate_sic(self, value):
         # Валидация СИК (Страховой идентификационный номер)
-        if not value.isdigit() or len(value) != 11:
-            raise serializers.ValidationError("СИК должен состоять из 11 цифр.")
+        if(value != None and value != ""):
+            if not value.isdigit() or len(value) != 11:
+                raise serializers.ValidationError("СИК должен состоять из 11 цифр.")
         return value
 
     # def validate_gender(self, value):

@@ -36,7 +36,7 @@ class CompanyInline(admin.TabularInline):
 
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('individual_client', 'insert_date', 'emp')
-    search_fields = ('individual_client__name', 'individual_client__surname', 'individual_client__middle_name', 'individual_client__reg_num')
+    search_fields = ('individual_client__full_name', 'individual_client__reg_num')
     inlines = [CompanyInline]
     
 class ContactAdmin(admin.ModelAdmin):
