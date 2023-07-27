@@ -364,6 +364,7 @@ class ClientRetrieveSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):  
     individual_client = IndividualClientSerializer(required=True)
+    category_type = CategoryTypeSerializer(read_only=True)
     class Meta:
         model = Client
         fields = "__all__"
@@ -392,7 +393,7 @@ class ClientSerializer(serializers.ModelSerializer):
         if reg_number != instance.individual_client.reg_number:
             instance.individual_client.reg_number = reg_number
         
-        
+
         instance.individual_client.full_name = individual_client_data.get('full_name', instance.individual_client.full_name)
         instance.individual_client.gender = individual_client_data.get('gender', instance.individual_client.gender)
         instance.individual_client.iin = individual_client_data.get('iin', instance.individual_client.iin)
