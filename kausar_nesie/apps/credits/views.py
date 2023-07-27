@@ -835,7 +835,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         if(payment_date == None):
             payment_date = datetime.date.today()
         else:
-            payment_date = datetime.datetime.strptime(payment_date, "%Y-%m-%d")
+            payment_date = datetime.datetime.strptime(payment_date, "%Y-%m-%d").date()
         
         if(payment_number == None):
             return Response({"error": "payment_number is required"}, status=status.HTTP_400_BAD_REQUEST)
