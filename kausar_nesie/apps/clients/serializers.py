@@ -247,16 +247,6 @@ class DocsSerializer(serializers.ModelSerializer):
         
         return value
 
-    def validate_series(self, value):
-        """
-        Валидация поля series: проверяем, что серия документа не пустая.
-        """
-        if value.strip():
-            if not re.match(r'^[a-zA-Z0-9]+$', value):
-                raise serializers.ValidationError("Серия документа может содержать только буквы и цифры.")
-        
-        return value
-
     def validate_start_date(self, value):
         """
         Валидация поля start_date: проверяем, что дата начала не находится в будущем.
