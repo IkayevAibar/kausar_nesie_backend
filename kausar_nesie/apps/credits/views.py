@@ -861,9 +861,9 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         penalty_amount = (credit_payment_schedule.total_payment - credit_payment_schedule.amount)
         
-        if(days > 0 and days < 90):
+        if(days > 0 and days <= 90):
             credit_payment_schedule.penalty_commission = float(penalty_amount  * days) * 0.5/100
-        if(days >= 90):
+        if(days > 90):
             credit_payment_schedule.penalty_commission =  (float(penalty_amount  * 90) * 0.5/100) + (float(penalty_amount  * days - 90) * 0.03/100)
 
         if(credit.is_affiliated == False):
