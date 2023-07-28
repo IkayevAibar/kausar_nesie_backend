@@ -455,7 +455,6 @@ class CreditViewSet(viewsets.ModelViewSet):
                 cps.total_payment = payment_amount
                 cps.principal_remaining = float(prev_cps.principal_remaining) - new_principal_payment
                 cps.status = PaymentStatus.objects.get(id=2)
-                # print(payment_amount, new_principal_payment, new_commission_payment, float(prev_cps.principal_remaining) - new_principal_payment)
                 cps.save()
 
                 try:
@@ -472,7 +471,6 @@ class CreditViewSet(viewsets.ModelViewSet):
                 monthly_payment = round(loan_amount * ((percent_rate*0.01/12)/(1-(1+percent_rate*0.01/12)**-(loan_term-cps.number))),0)
                 
                 for month in range(cps.number + 1, loan_term + 1):
-                    print(month)
                     if month <= loan_term:
                         monthly_commission = round(loan_amount * monthly_commission_in, 0)
                     else:
@@ -571,16 +569,16 @@ class CreditViewSet(viewsets.ModelViewSet):
         cps.total_payment = float(new_first_payment_amount)
         cps.principal_remaining = prev_principal_remaining - pp
         cps.status = PaymentStatus.objects.get(id=2)
+        cps.date_get_payment = datetime.datetime.now()
         cps.save()
 
         cpss = CreditPaymentSchedule.objects.filter(credit=credit, number__gte=int(number)+1).order_by('number')
-        
         temp_principal_remaining = prev_principal_remaining - pp
         days_in_first_payment = 30
         days_in_last_payment = 30
         monthly_commission_in = 0
         percent_rate = float(credit.effective_rate)
-        loan_term = credit.period_count - int(number)
+        loan_term = credit.period_count-int(number)
         monthly_payment = round(temp_principal_remaining * ((percent_rate*0.01/12)/(1-(1+percent_rate*0.01/12)**-loan_term)),0)
         principal_remaining = temp_principal_remaining
         commission_payment = 0
@@ -588,8 +586,8 @@ class CreditViewSet(viewsets.ModelViewSet):
         sum_of_principal_remaining = 0
         sum_of_monthly_commission = 0
         for item in cpss:
-
-            row = self.row_calculator(self=self, month=item.number, loan_term=loan_term, loan_amount=credit.amount, monthly_commission_in=monthly_commission_in, percent_rate=percent_rate, credit_payment_type=1, days_in_first_payment=days_in_first_payment, days_in_last_payment=days_in_last_payment, principal_remaining=principal_remaining, monthly_payment=monthly_payment)
+            print(item.number)
+            row = self.row_calculator(self=self, month=item.number, loan_term=loan_term+int(number), loan_amount=credit.amount, monthly_commission_in=monthly_commission_in, percent_rate=percent_rate, credit_payment_type=1, days_in_first_payment=days_in_first_payment, days_in_last_payment=days_in_last_payment, principal_remaining=principal_remaining, monthly_payment=monthly_payment)
             
             principal_payment = row['principal_payment']
             commission_payment = row['commission_payment']
@@ -604,7 +602,6 @@ class CreditViewSet(viewsets.ModelViewSet):
             # Высчитываем Сумма ежемес. ком.
             sum_of_monthly_commission+=monthly_commission
 
-            print(item.number, principal_payment, commission_payment, principal_remaining, monthly_commission)
             item.principal_payment = principal_payment
             item.commission_payment = commission_payment
             item.total_payment = principal_payment + commission_payment
@@ -870,19 +867,14 @@ class CreditViewSet(viewsets.ModelViewSet):
             credit.client.category_type = CategoryType.objects.get(code="1")
 
             if(days >= 1 and days < 30):
-                print("2")
                 credit.client.category_type = CategoryType.objects.get(code="2")
             elif(days >= 30 and days < 60):
-                print("3")
                 credit.client.category_type = CategoryType.objects.get(code="3")
             elif(days >= 60 and days < 90):
-                print("4")
                 credit.client.category_type = CategoryType.objects.get(code="4")
             elif(days >= 90 and days < 180):
-                print("5")
                 credit.client.category_type = CategoryType.objects.get(code="5")
             elif(days >= 180):
-                print("6")
                 credit.client.category_type = CategoryType.objects.get(code="6")
 
         credit.client.save()

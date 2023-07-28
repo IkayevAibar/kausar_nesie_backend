@@ -83,7 +83,6 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
     def validate_rnn(self, value):
         # Валидация РНН (Регистрационный номер налогоплательщика)
-        print("rnn:",value)
         if(value != None and value != ""):
             if not value.isdigit() or len(value) != 12:
                 raise serializers.ValidationError("РНН должен состоять из 12 цифр.")
