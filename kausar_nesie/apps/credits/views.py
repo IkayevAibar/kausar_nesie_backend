@@ -138,7 +138,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_010 = str(credit.period_count)
 
         field_name_011 = "_string_credit_term_"
-        field_value_011 = num2words(str(credit.period_count))
+        field_value_011 = num2words(str(credit.period_count), lang='ru')
         
 
         field_name_1 = "_credit_end_day_"
