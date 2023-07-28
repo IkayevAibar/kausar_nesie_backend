@@ -850,29 +850,34 @@ class CreditViewSet(viewsets.ModelViewSet):
         
         days = (payment_date - credit_payment_schedule.date_to_payment).days
 
-        penalty_amount = float((credit_payment_schedule.total_payment - credit_payment_schedule.amount) * days)
+        penalty_amount = (credit_payment_schedule.total_payment - credit_payment_schedule.amount)
         
         if(days > 0 and days < 90):
-            credit_payment_schedule.penalty_commission = penalty_amount * 0.5/100
-        if(days >= 90 and days < 180):
-            credit_payment_schedule.penalty_commission = penalty_amount * 0.03/100
+            credit_payment_schedule.penalty_commission = float(penalty_amount  * days) * 0.5/100
+        if(days >= 90):
+            credit_payment_schedule.penalty_commission =  (float(penalty_amount  * 90) * 0.5/100) + (float(penalty_amount  * days - 90) * 0.03/100)
 
         if(credit.is_affiliated == False):
             credit.client.category_type = CategoryType.objects.get(code="1")
 
             if(days >= 1 and days < 30):
-                credit.client.categoty_type = CategoryType.objects.get(code="2")
-            if(days >= 30 and days < 60):
-                credit.client.categoty_type = CategoryType.objects.get(code="3")
-            if(days >= 60 and days < 90):
-                credit.client.categoty_type = CategoryType.objects.get(code="4")
-            if(days >= 90 and days < 180):
-                credit.client.categoty_type = CategoryType.objects.get(code="5")
-            if(days >= 180):
-                credit.client.categoty_type = CategoryType.objects.get(code="6")
+                print("2")
+                credit.client.category_type = CategoryType.objects.get(code="2")
+            elif(days >= 30 and days < 60):
+                print("3")
+                credit.client.category_type = CategoryType.objects.get(code="3")
+            elif(days >= 60 and days < 90):
+                print("4")
+                credit.client.category_type = CategoryType.objects.get(code="4")
+            elif(days >= 90 and days < 180):
+                print("5")
+                credit.client.category_type = CategoryType.objects.get(code="5")
+            elif(days >= 180):
+                print("6")
+                credit.client.category_type = CategoryType.objects.get(code="6")
 
-            credit.client.save()
-            credit.save()
+        credit.client.save()
+        credit.save()
         
         credit_payment_schedule.save()
         
