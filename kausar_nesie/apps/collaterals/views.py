@@ -1,5 +1,9 @@
 from .serializers import *
+
 from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from django_filters.rest_framework import DjangoFilterBackend, IsoDateTimeFilter, DateFilter, LookupChoiceFilter
 from django_filters import FilterSet
 
@@ -14,6 +18,15 @@ class CollateralViewSet(viewsets.ModelViewSet):
     serializer_class = CollateralSerializer
     filterset_class = CollateralFilter
     filter_backends = [DjangoFilterBackend,]
+
+    @action(detail=False, methods=['get'])
+    def get_last_num_reg(self, request):
+        last_object = Collateral.objects.last()
+        if last_object:
+            value = last_object.id
+        else: value = 0
+
+        return Response({'last_num_reg': value})
     
     def get_permissions(self):
         if self.action == 'create':

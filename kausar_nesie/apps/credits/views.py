@@ -857,21 +857,23 @@ class CreditViewSet(viewsets.ModelViewSet):
         if(days >= 90 and days < 180):
             credit_payment_schedule.penalty_commission = penalty_amount * 0.03/100
 
-        credit.client.category_type = CategoryType.objects.get(code="1")
+        if(credit.is_affiliated == False):
+            credit.client.category_type = CategoryType.objects.get(code="1")
 
-        if(days >= 1 and days < 30):
-            credit.client.categoty_type = CategoryType.objects.get(code="2")
-        if(days >= 30 and days < 60):
-            credit.client.categoty_type = CategoryType.objects.get(code="3")
-        if(days >= 60 and days < 90):
-            credit.client.categoty_type = CategoryType.objects.get(code="4")
-        if(days >= 90 and days < 180):
-            credit.client.categoty_type = CategoryType.objects.get(code="5")
-        if(days >= 180):
-            credit.client.categoty_type = CategoryType.objects.get(code="6")
+            if(days >= 1 and days < 30):
+                credit.client.categoty_type = CategoryType.objects.get(code="2")
+            if(days >= 30 and days < 60):
+                credit.client.categoty_type = CategoryType.objects.get(code="3")
+            if(days >= 60 and days < 90):
+                credit.client.categoty_type = CategoryType.objects.get(code="4")
+            if(days >= 90 and days < 180):
+                credit.client.categoty_type = CategoryType.objects.get(code="5")
+            if(days >= 180):
+                credit.client.categoty_type = CategoryType.objects.get(code="6")
 
-        credit.client.save()
-        credit.save()
+            credit.client.save()
+            credit.save()
+        
         credit_payment_schedule.save()
         
         return Response({"success": "Успешно пересчитана сумма оплата", "days": days}, status=status.HTTP_200_OK)
@@ -945,6 +947,15 @@ class CreditViewSet(viewsets.ModelViewSet):
             credit_payment_schedule.save()
         
         return Response({"success": "Оплата произошла"}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'])
+    def get_last_num_reg(self, request):
+        last_object = Credit.objects.last()
+        if last_object:
+            value = last_object.id
+        else: value = 0
+
+        return Response({'last_num_reg': value})
 
 class CreditTreatmentViewSet(viewsets.ModelViewSet):
     queryset = CreditTreatments.objects.all()
@@ -985,6 +996,15 @@ class CreditLineViewSet(viewsets.ModelViewSet):
     serializer_class = CreditLineSerializer
     permission_classes = [permissions.AllowAny]
 
+    @action(detail=False, methods=['get'])
+    def get_last_num_reg(self, request):
+        last_object = CreditLine.objects.last()
+        if last_object:
+            value = last_object.id
+        else: value = 0
+
+        return Response({'last_num_reg': value})
+    
     @action(detail=True, methods=['post'])
     def add_credit(self, request, pk=None):
         credit_line = CreditLine.objects.get(id=pk)
