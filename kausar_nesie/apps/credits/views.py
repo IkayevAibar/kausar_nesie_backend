@@ -864,7 +864,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         if(days > 0 and days <= 90):
             credit_payment_schedule.penalty_commission = float(penalty_amount  * days) * 0.5/100
         if(days > 90):
-            credit_payment_schedule.penalty_commission =  (float(penalty_amount  * 90) * 0.5/100) + (float(penalty_amount  * days - 90) * 0.03/100)
+            credit_payment_schedule.penalty_commission =  (float(penalty_amount  * 90) * 0.5/100) + (float(penalty_amount  * (days - 90)) * 0.03/100)
 
         if(credit.is_affiliated == False):
             credit.client.category_type = CategoryType.objects.get(code="1")
@@ -962,6 +962,10 @@ class CreditViewSet(viewsets.ModelViewSet):
         
         return Response({"success": "Оплата произошла"}, status=status.HTTP_200_OK)
     
+    @action(detail=True, methods=['get'])
+    def payment_of_penalty(self, request, pk=None):
+
+
     @action(detail=False, methods=['get'])
     def get_last_num_reg(self, request):
         last_object = Credit.objects.last()
