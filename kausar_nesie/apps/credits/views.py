@@ -112,7 +112,7 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         field_name_01 = "_credit_protocol_number_"
         field_value_01 = credit.num_dog
-
+        
         field_name_02 = "_credit_day_number_"
         field_value_02 = credit.date_begin.strftime("%d")
         
@@ -133,6 +133,13 @@ class CreditViewSet(viewsets.ModelViewSet):
 
         field_name_07 = "_credit_string_amount_"
         field_value_07 = num2words(str(credit.amount).rstrip("0").rstrip("."), lang='ru')
+
+        field_name_08 = "_credit_term_"
+        field_value_08 = str(credit.period_count)
+
+        field_name_08 = "_string_credit_term_"
+        field_value_08 = num2words(str(credit.period_count))
+        
 
         field_name_1 = "_credit_end_day_"
         field_value_1 = credit.date_end.strftime("%d")
