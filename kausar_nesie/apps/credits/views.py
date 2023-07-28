@@ -936,18 +936,7 @@ class CreditViewSet(viewsets.ModelViewSet):
             credit_payment_schedule.not_paid_amount = total_payment - int(balance)
             credit_payment_schedule.amount = balance
             credit_payment_schedule.date_get_payment = payment_date
-            
-            if(credit_payment_schedule.date_to_payment < payment_date):
-
-                next_credit_payment_schedule = CreditPaymentSchedule.objects.get(credit=credit, number=int(payment_number)+1)
-                next_credit_payment_schedule.penalty_commission = next_credit_payment_schedule.total_payment - int(balance) + credit_payment_schedule.penalty_commission
-                next_credit_payment_schedule.total_payment += next_credit_payment_schedule.total_payment - int(balance)
-                credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
-                
-                next_credit_payment_schedule.save()
-            else:
-                credit_payment_schedule.status = PaymentStatus.objects.get(id=6)
-
+            credit_payment_schedule.status = PaymentStatus.objects.get(id=3)
             credit_payment_schedule.save()
         else:
             account_action_status = self.discharge_account(self, credit.client, total_payment)
@@ -1009,7 +998,6 @@ class CreditPaymentScheduleViewSet(viewsets.ModelViewSet):
         )
     
     
-
 class CreditLineViewSet(viewsets.ModelViewSet):
     queryset = CreditLine.objects.all()
     serializer_class = CreditLineSerializer

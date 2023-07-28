@@ -48,6 +48,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
         'individual_client__client_category']
 
+    pagination_class = None
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
