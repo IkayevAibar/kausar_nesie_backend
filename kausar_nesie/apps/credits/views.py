@@ -964,6 +964,7 @@ class CreditViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def payment_of_penalty(self, request, pk=None):
+        pass
 
 
     @action(detail=False, methods=['get'])
