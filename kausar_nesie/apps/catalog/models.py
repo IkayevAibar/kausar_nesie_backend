@@ -335,8 +335,8 @@ class Currencies(models.Model):
 class CreditTarget(models.Model):
     """Справочник. Цели кредитования"""
 
-    name = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
-    code = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
+    name = models.CharField(max_length=255, verbose_name="Код", blank=True, null=False)
+    code = models.CharField(max_length=255, verbose_name="Наименование", blank=True, null=False)
 
     def __str__(self):
         return f"{self.name} {self.code}"

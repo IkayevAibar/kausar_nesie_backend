@@ -163,7 +163,7 @@ class CreditViewSet(viewsets.ModelViewSet):
         field_value_5 = "Аннуитетный"
 
         field_name_6 = "_credit_aim_"
-        field_value_6 = credit.credit_target.name
+        field_value_6 = credit.credit_target.code
 
         field_name_7 = "_year_effect_rate_persent_"
         field_value_7 = str(data["gesv"])
