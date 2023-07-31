@@ -8,6 +8,9 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend , CharFilter
 from django_filters import FilterSet, DateTimeFromToRangeFilter
 
+# from excel_response import ExcelResponse
+from django_excel_response import ExcelResponse
+
 from .serializers import *
 from .models import *
 
@@ -164,6 +167,26 @@ class AccountViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['=acc_num', 'id']
     ordering_fields = ['id', 'amount', 'date_open']
+
+    @action(detail=False, methods=['get'])
+    def excel_list(self, request, *args, **kwargs):
+        # Выполняем поиск и фильтрацию
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Ваш сериализатор для преобразования QuerySet в данные Excel
+        serializer = self.get_serializer(queryset, many=True)
+
+        # # Преобразуем данные сериализатора в список списков (для Excel)
+        # data = [list(item.values()) for item in serializer.data]
+
+        # # Заголовки столбцов
+        # headers = list(serializer.data[0].keys()) if serializer.data else []
+
+        # Создаем файл Excel
+        # response = ExcelResponse(data, output_name='account_data', headers=headers, sheet_name='Accounts')
+
+        response = ExcelResponse(serializer.data, output_name='account_data', sheet_name='Accounts')
+        return response
 
 
 class DocsViewSet(viewsets.ModelViewSet):
