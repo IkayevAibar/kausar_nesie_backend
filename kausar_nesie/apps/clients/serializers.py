@@ -366,6 +366,7 @@ class ClientRetrieveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ClientSerializer(serializers.ModelSerializer):  
+    # id = serializers.UUIDField(read_only=True)
     individual_client = IndividualClientSerializer(required=True)
     category_type = CategoryTypeSerializer(read_only=True)
     class Meta:

@@ -5,7 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend , CharFilter
+from django_filters import FilterSet, DateTimeFromToRangeFilter
 
 from .serializers import *
 from .models import *
@@ -35,6 +36,14 @@ class AddressViewSet(viewsets.ModelViewSet):
             return AddressRetrieveSerializer
         return self.serializer_class
 
+class ClientFilter(FilterSet):
+    individual_client__rnn = CharFilter()
+    individual_client__iin = CharFilter()
+    individual_client__full_name = CharFilter()
+    class Meta:
+        model = Client
+        fields = ['individual_client__rnn','individual_client__iin', 'individual_client__full_name', 'individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
+    'individual_client__client_category']
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -43,10 +52,12 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
-        'individual_client__full_name',]
-    filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
-        'individual_client__client_category']
+    filterset_class = ClientFilter
+
+    # search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
+    #     'individual_client__full_name',]
+    # filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
+    #     'individual_client__client_category']
 
     pagination_class = None
 
