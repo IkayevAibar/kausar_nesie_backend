@@ -158,14 +158,21 @@ class CompanyViewSet(viewsets.ModelViewSet):
             return CompanyRetrieveSerializer
         return self.serializer_class
 
+class AccountFilter(FilterSet):
+    id = CharFilter()
+    acc_num = CharFilter()
+    class Meta:
+        model = Account
+        fields = ['id', 'acc_num']
 
 class AccountViewSet(viewsets.ModelViewSet):
     """Счета"""
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_classes = [AllowAny]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['=acc_num', 'id']
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    # search_fields = ['=acc_num', 'id']
+    filterset_class = AccountFilter
     ordering_fields = ['id', 'amount', 'date_open']
 
     @action(detail=False, methods=['get'])
@@ -176,16 +183,16 @@ class AccountViewSet(viewsets.ModelViewSet):
         # Ваш сериализатор для преобразования QuerySet в данные Excel
         serializer = self.get_serializer(queryset, many=True)
 
-        # # Преобразуем данные сериализатора в список списков (для Excel)
-        # data = [list(item.values()) for item in serializer.data]
+        # Преобразуем данные сериализатора в список списков (для Excel)
+        data = [list(item.values()) for item in serializer.data]
 
-        # # Заголовки столбцов
-        # headers = list(serializer.data[0].keys()) if serializer.data else []
+        # Заголовки столбцов
+        headers = list(serializer.data[0].keys()) if serializer.data else []
 
         # Создаем файл Excel
-        # response = ExcelResponse(data, output_name='account_data', headers=headers, sheet_name='Accounts')
+        response = ExcelResponse(data, output_name='account_data', headers=headers, sheet_name='Accounts')
 
-        response = ExcelResponse(serializer.data, output_name='account_data', sheet_name='Accounts')
+        # response = ExcelResponse(serializer.data, output_name='account_data', sheet_name='Accounts')
         return response
 
 
