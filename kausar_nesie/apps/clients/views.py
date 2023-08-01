@@ -172,7 +172,28 @@ class CompanyViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
             return CompanyRetrieveSerializer
+        if self.action == 'add_owner_to_company':
+            return CompanyAddOwnerSerializer
         return self.serializer_class
+    
+    @action(detail=False, methods=['post'])
+    def add_owner_to_company(self, request, pk=None):
+        company = self.get_object()
+
+        try:
+            owner_id = request.data['owner_id']
+        except KeyError:
+            return Response({'error': 'owner_id не указан'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            owner = Client.objects.get(id=owner_id)
+        except Client.DoesNotExist:
+            return Response({'error': 'Клиент не найден'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        company.owners.add(owner)
+        company.save()
+
+        return Response({'success': 'Сохранено'}, status=status.HTTP_200_OK)
 
 class AccountFilter(FilterSet):
     id = CharFilter()

@@ -45,12 +45,13 @@ class Company(models.Model):
                                  on_delete=models.CASCADE)
     form_property = models.ForeignKey('catalog.FormProperty', verbose_name="Форма собс.", null=True, blank=True,
                                       on_delete=models.CASCADE)
-    okpo = models.CharField(max_length=255, verbose_name="ОКПО", blank=True)
-    reg_num = models.CharField(max_length=255, verbose_name="Регистрационный номер", blank=True)
-    reg_date = models.DateField(verbose_name="Дата регистрации", blank=True, default=timezone.now)
-    reg_org = models.CharField(max_length=255, verbose_name="Регистрирующий орган", blank=True)
-    certify_ser = models.CharField(max_length=20, verbose_name="Серия рег. удостоверения", blank=True)
-    certify_num = models.CharField(max_length=20, verbose_name="Номер рег. удостоврения", blank=True)
+    bin = models.CharField(max_length=255, verbose_name="БИН", blank=True)
+    okpo = models.CharField(max_length=255, verbose_name="ОКПО", blank=True, null=True)
+    reg_num = models.CharField(max_length=255, verbose_name="Регистрационный номер", blank=True, unique=True)
+    reg_date = models.DateField(verbose_name="Дата регистрации", blank=True, default=timezone.now, null=True)
+    reg_org = models.CharField(max_length=255, verbose_name="Регистрирующий орган", blank=True, null=True)
+    certify_ser = models.CharField(max_length=20, verbose_name="Серия рег. удостоверения", blank=True, null=True)
+    certify_num = models.CharField(max_length=20, verbose_name="Номер рег. удостоврения", blank=True, null=True)
 
     owners = models.ManyToManyField('Client', related_name='company_owners', blank=True)
     def __str__(self):

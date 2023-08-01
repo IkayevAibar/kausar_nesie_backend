@@ -108,6 +108,15 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    sector = SectorEconSerializer(read_only=True)
+    org_form = OrgFormSerializer(read_only=True)
+    form_property = FormPropertySerializer(read_only=True)
+    okpo = serializers.CharField(read_only=True)
+    reg_date = serializers.DateField(read_only=True)
+    reg_org = serializers.CharField(read_only=True)
+    certify_ser = serializers.CharField(read_only=True)
+    certify_num = serializers.CharField(read_only=True)
+    owners = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
     """Юр лица"""
     def validate_short_name(self, value):
         """
@@ -125,13 +134,13 @@ class CompanySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Полное наименование не может быть пустым.")
         return value
 
-    def validate_okpo(self, value):
-        """
-        Валидация поля okpo: проверяем, что ОКПО состоит из 8 или 10 цифр.
-        """
-        if not value.isdigit() or len(value) not in (8, 10):
-            raise serializers.ValidationError("ОКПО должен состоять из 8 или 10 цифр.")
-        return value
+    # def validate_okpo(self, value):
+    #     """
+    #     Валидация поля okpo: проверяем, что ОКПО состоит из 8 или 10 цифр.
+    #     """
+    #     if not value.isdigit() or len(value) not in (8, 10):
+    #         raise serializers.ValidationError("ОКПО должен состоять из 8 или 10 цифр.")
+    #     return value
 
     def validate_reg_num(self, value):
         """
@@ -141,29 +150,29 @@ class CompanySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Регистрационный номер не может быть пустым.")
         return value
 
-    def validate_reg_date(self, value):
-        """
-        Валидация поля reg_date: проверяем, что дата регистрации не находится в будущем.
-        """
-        if value > timezone.now().date():
-            raise serializers.ValidationError("Дата регистрации не может быть в будущем.")
-        return value
+    # def validate_reg_date(self, value):
+    #     """
+    #     Валидация поля reg_date: проверяем, что дата регистрации не находится в будущем.
+    #     """
+    #     if value > timezone.now().date():
+    #         raise serializers.ValidationError("Дата регистрации не может быть в будущем.")
+    #     return value
 
-    def validate_certify_ser(self, value):
-        """
-        Валидация поля certify_ser: проверяем, что серия рег. удостоверения не пустая.
-        """
-        if not value.strip():
-            raise serializers.ValidationError("Серия рег. удостоверения не может быть пустой.")
-        return value
+    # def validate_certify_ser(self, value):
+    #     """
+    #     Валидация поля certify_ser: проверяем, что серия рег. удостоверения не пустая.
+    #     """
+    #     if not value.strip():
+    #         raise serializers.ValidationError("Серия рег. удостоверения не может быть пустой.")
+    #     return value
 
-    def validate_certify_num(self, value):
-        """
-        Валидация поля certify_num: проверяем, что номер рег. удостоверения не пустой.
-        """
-        if not value.strip():
-            raise serializers.ValidationError("Номер рег. удостоверения не может быть пустым.")
-        return value
+    # def validate_certify_num(self, value):
+    #     """
+    #     Валидация поля certify_num: проверяем, что номер рег. удостоверения не пустой.
+    #     """
+    #     if not value.strip():
+    #         raise serializers.ValidationError("Номер рег. удостоверения не может быть пустым.")
+    #     return value
     class Meta:
         model = Company
         fields = "__all__"
@@ -415,3 +424,7 @@ class CompanyRetrieveSerializer(serializers.ModelSerializer):
         model = Company
         fields = "__all__"
 
+
+class CompanyAddOwnerSerializer(serializers.Serializer):
+    """Добавление владельца"""
+    owner_id = serializers.CharField(required=True)
