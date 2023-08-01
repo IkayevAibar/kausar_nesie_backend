@@ -176,7 +176,35 @@ class CompanyViewSet(viewsets.ModelViewSet):
             return CompanyAddOwnerSerializer
         return self.serializer_class
     
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['get'])
+    def get_last_num_reg(self, request):
+        last_object = Company.objects.order_by('-id').first()  # Получаем последнего клиента по id
+        if last_object:
+            last_num_reg = last_object.reg_num
+            try:
+                last_num_int = int(last_num_reg)  # Предполагаем, что reg_number является числом
+            except ValueError:
+                last_num_int = 0
+        else:
+            last_num_int = 0
+
+        while True:
+            new_num_int = last_num_int + 1
+            new_num_reg = str(new_num_int).zfill(6)  # Преобразуем в строку, заполняя нулями до 6 символов
+
+            try:
+                # Проверяем, нет ли в базе данных клиента с таким номером
+                Company.objects.get(reg_num=new_num_reg)
+            except Company.DoesNotExist:
+                # Если клиент с таким номером не найден, значит, это уникальный номер
+                break
+            else:
+                # Если клиент с таким номером найден, генерируем новый номер и повторяем проверку
+                last_num_int = new_num_int
+
+        return Response({'last_num_reg': new_num_reg})
+    
+    @action(detail=True, methods=['post'])
     def add_owner_to_company(self, request, pk=None):
         company = self.get_object()
 
