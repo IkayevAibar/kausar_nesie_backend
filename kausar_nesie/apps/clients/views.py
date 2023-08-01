@@ -55,12 +55,12 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_class = ClientFilter
+    # filterset_class = ClientFilter
 
-    # search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
-    #     'individual_client__full_name',]
-    # filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
-    #     'individual_client__client_category']
+    search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
+        'individual_client__full_name',]
+    filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
+        'individual_client__client_category']
 
     pagination_class = None
 
