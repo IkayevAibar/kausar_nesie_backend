@@ -108,15 +108,6 @@ class IndividualClientSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    sector = SectorEconSerializer(read_only=True)
-    org_form = OrgFormSerializer(read_only=True)
-    form_property = FormPropertySerializer(read_only=True)
-    okpo = serializers.CharField(read_only=True)
-    reg_date = serializers.DateField(read_only=True)
-    reg_org = serializers.CharField(read_only=True)
-    certify_ser = serializers.CharField(read_only=True)
-    certify_num = serializers.CharField(read_only=True)
-    owners = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
     """Юр лица"""
     def validate_short_name(self, value):
         """
@@ -175,7 +166,7 @@ class CompanySerializer(serializers.ModelSerializer):
     #     return value
     class Meta:
         model = Company
-        fields = "__all__"
+        fields = ["reg_num", "bin", "short_name", "full_name"]
 
 class CompanyInClientRetrieveSerializer(serializers.ModelSerializer):
     """Юр лица"""
