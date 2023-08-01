@@ -140,12 +140,28 @@ class ClientViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def get_last_num_reg(self, request):
-        last_client = Client.objects.last()
+        last_client = Client.objects.order_by('-id').first()  # Получаем последнего клиента по id
         if last_client:
-            value = last_client.id
-        else: value = 0
+            last_num_reg = last_client.individual_client.reg_number
+            last_num_int = int(last_num_reg)  # Предполагаем, что reg_number является числом
+        else:
+            last_num_int = 0
 
-        return Response({'last_num_reg': value})
+        while True:
+            new_num_int = last_num_int + 1
+            new_num_reg = str(new_num_int).zfill(6)  # Преобразуем в строку, заполняя нулями до 6 символов
+
+            try:
+                # Проверяем, нет ли в базе данных клиента с таким номером
+                Client.objects.get(individual_client__reg_number=new_num_reg)
+            except Client.DoesNotExist:
+                # Если клиент с таким номером не найден, значит, это уникальный номер
+                break
+            else:
+                # Если клиент с таким номером найден, генерируем новый номер и повторяем проверку
+                last_num_int = new_num_int
+
+        return Response({'last_num_reg': new_num_reg})
 
 class CompanyViewSet(viewsets.ModelViewSet):
     """Юр лица"""
