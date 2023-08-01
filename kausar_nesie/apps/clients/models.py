@@ -62,6 +62,7 @@ class Company(models.Model):
 
 class Client(models.Model):
     """Клиенты"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     emp = models.ForeignKey(User, related_name="manager", verbose_name="Идентификатор пользователя создавшего запись",
                             on_delete=models.SET_NULL, blank=True, null=True)
     insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)

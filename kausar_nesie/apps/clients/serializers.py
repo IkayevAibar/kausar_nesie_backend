@@ -102,15 +102,6 @@ class IndividualClientSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("СИК должен состоять из 11 цифр.")
         return value
 
-    # def validate_gender(self, value):
-    #     """
-    #     Валидация поля gender: проверяем, что выбран корректный вариант пола.
-    #     """
-    #     valid_genders = [choice[0] for choice in IndividualClient.GENDER_CHOICES]
-    #     if value not in valid_genders:
-    #         raise serializers.ValidationError("Выберите корректный пол.")
-    #     return value
-
     class Meta:
         model = IndividualClient
         fields = "__all__"
