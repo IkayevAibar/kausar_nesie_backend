@@ -176,6 +176,14 @@ class CompanyViewSet(viewsets.ModelViewSet):
             return CompanyAddOwnerSerializer
         return self.serializer_class
     
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Instead of returning the full serialized data, return only the 'id' field
+        return Response({'company_id': serializer.instance.id}, status=status.HTTP_201_CREATED)
+    
     @action(detail=False, methods=['get'])
     def get_last_num_reg(self, request):
         last_object = Company.objects.order_by('-id').first()  # Получаем последнего клиента по id
