@@ -166,7 +166,8 @@ class CompanySerializer(serializers.ModelSerializer):
     #     return value
     class Meta:
         model = Company
-        fields = ["reg_num", "bin", "short_name", "full_name"]
+        # fields = "__all__"
+        exclude = ['owners']
 
 class CompanyInClientRetrieveSerializer(serializers.ModelSerializer):
     """Юр лица"""
@@ -344,21 +345,9 @@ class ClientAddBalanceToAccountSerializer(serializers.Serializer):
     amount = serializers.CharField(required=True)
 
 
-class ClientRetrieveSerializer(serializers.ModelSerializer):
-    """Клиенты"""
-    individual_client = IndividualClientRetrieveSerializer(required=False)
-    docs = DocsSerializer(many=True, read_only=True)
-    addresses = AddressRetrieveSerializer(many=True, read_only=True)
-    contacts = ContactRetrieveSerializer(many=True, read_only=True)
-    companies = CompanyInClientRetrieveSerializer(many=True, read_only=True, source="company_owners")
-
-    class Meta:
-        model = Client
-        fields = "__all__"
 
 class ClientSerializer(serializers.ModelSerializer):  
     # id = serializers.UUIDField(read_only=True)
-    individual_client = IndividualClientSerializer(required=True)
     category_type = CategoryTypeSerializer(read_only=True)
     class Meta:
         model = Client
@@ -419,3 +408,27 @@ class CompanyRetrieveSerializer(serializers.ModelSerializer):
 class CompanyAddOwnerSerializer(serializers.Serializer):
     """Добавление владельца"""
     owner_id = serializers.CharField(required=True)
+
+class CompanyAddRequisiteSerializer(serializers.Serializer):
+    """Добавление реквизитов"""
+    sector = serializers.CharField(required=True)
+    org_form = serializers.CharField(required=True)
+    form_property = serializers.CharField(required=True)
+    country = serializers.CharField(required=True)
+
+
+
+
+class ClientRetrieveSerializer(serializers.ModelSerializer):
+    """Клиенты"""
+    individual_client = IndividualClientSerializer(source='individualclient', read_only=True)
+    company = CompanySerializer(read_only=True)
+
+    docs = DocsSerializer(many=True, read_only=True)
+    addresses = AddressRetrieveSerializer(many=True, read_only=True)
+    contacts = ContactRetrieveSerializer(many=True, read_only=True)
+    # companies = CompanyInClientRetrieveSerializer(many=True, read_only=True, source="company_owners")
+
+    class Meta:
+        model = Client
+        fields = "__all__"

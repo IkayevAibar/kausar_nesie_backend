@@ -5,7 +5,26 @@ import uuid
 User = get_user_model()
 
 
-class IndividualClient(models.Model):
+class Client(models.Model):
+    """Клиенты"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reg_num = models.CharField(max_length=255, verbose_name="Регистрационный номер", blank=True, unique=True)
+    emp = models.ForeignKey(User, related_name="manager", verbose_name="Идентификатор пользователя создавшего запись",
+                            on_delete=models.SET_NULL, blank=True, null=True)
+    insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)
+    category_type = models.ForeignKey('catalog.CategoryType', verbose_name="Тип Категории", null=True, blank=True,
+                                     on_delete=models.CASCADE)
+    is_individual = models.BooleanField(default=True, verbose_name="Физическое лицо", blank=True)
+    client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
+                                      on_delete=models.SET_NULL)
+    def __str__(self):
+        return f"{self.id}"
+
+    class Meta:
+        verbose_name = "Клиент"
+        verbose_name_plural = "Клиенты"
+
+class IndividualClient(Client):
     """Физическое лицо"""
     MALE = 1
     FEMALE = 2
@@ -14,7 +33,6 @@ class IndividualClient(models.Model):
         (FEMALE, 'Женский'),
     )
 
-    reg_number = models.CharField(max_length=255, unique=True, verbose_name="Номер peг.", blank=True, null=False)
     full_name = models.CharField(max_length=255, verbose_name="Полное имя", blank=True, null=False)
     gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=False, blank=False, verbose_name=("Пол"))
     date_of_birth = models.DateField(verbose_name="Дата рождения", null=False, blank=True, default=timezone.now)
@@ -24,8 +42,7 @@ class IndividualClient(models.Model):
     sic = models.CharField(max_length=255, verbose_name="СИК", blank=True)
     is_resident = models.BooleanField(default=True, verbose_name="Резидент", blank=True)
     country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True,on_delete=models.SET_NULL)
-    client_category = models.ForeignKey('catalog.ClientCategory', verbose_name="Категория клиента", null=True, blank=True,
-                                      on_delete=models.SET_NULL)
+    
     
     def __str__(self):
         return f"{self.full_name}"
@@ -34,7 +51,7 @@ class IndividualClient(models.Model):
         verbose_name = "Физическое лицо"
         verbose_name_plural = "Физические лица"
 
-class Company(models.Model):
+class Company(Client):
     """Юридические лица"""
 
     short_name = models.CharField(max_length=2000, verbose_name="Короткое наименование", blank=True)
@@ -47,11 +64,11 @@ class Company(models.Model):
                                       on_delete=models.CASCADE)
     bin = models.CharField(max_length=255, verbose_name="БИН", blank=True)
     okpo = models.CharField(max_length=255, verbose_name="ОКПО", blank=True, null=True)
-    reg_num = models.CharField(max_length=255, verbose_name="Регистрационный номер", blank=True, unique=True)
     reg_date = models.DateField(verbose_name="Дата регистрации", blank=True, default=timezone.now, null=True)
     reg_org = models.CharField(max_length=255, verbose_name="Регистрирующий орган", blank=True, null=True)
     certify_ser = models.CharField(max_length=20, verbose_name="Серия рег. удостоверения", blank=True, null=True)
     certify_num = models.CharField(max_length=20, verbose_name="Номер рег. удостоврения", blank=True, null=True)
+    country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True, on_delete=models.CASCADE)
 
     owners = models.ManyToManyField('Client', related_name='company_owners', blank=True)
     def __str__(self):
@@ -60,24 +77,6 @@ class Company(models.Model):
     class Meta:
         verbose_name = "Юридическое лицо"
         verbose_name_plural = "Юридические лица"
-
-class Client(models.Model):
-    """Клиенты"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    emp = models.ForeignKey(User, related_name="manager", verbose_name="Идентификатор пользователя создавшего запись",
-                            on_delete=models.SET_NULL, blank=True, null=True)
-    insert_date = models.DateField(auto_now_add=True, verbose_name='Дата ввода записи', editable=False)
-    individual_client = models.OneToOneField(IndividualClient, on_delete=models.CASCADE, null=True, blank=True)
-    category_type = models.ForeignKey('catalog.CategoryType', verbose_name="Категория клиента", null=True, blank=True,
-                                     on_delete=models.CASCADE)
-    def __str__(self):
-        if(self.individual_client):
-            return f"{self.individual_client.full_name}"
-        return f"{self.id}"
-
-    class Meta:
-        verbose_name = "Клиент"
-        verbose_name_plural = "Клиенты"
 
 class Docs(models.Model):
     """Документы"""

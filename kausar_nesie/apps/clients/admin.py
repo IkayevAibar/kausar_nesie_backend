@@ -3,10 +3,10 @@ from django import forms
 from .models import *
 # Register your models here.
 
-class IndividualClientAdmin(admin.ModelAdmin):
-    list_display = ('reg_number', 'full_name', 'gender', 'date_of_birth', 'place_of_birth', 'rnn', 'iin', 'sic', 'is_resident', 'country', 'client_category')
-    list_filter = ('client_category', 'country', 'is_resident', 'place_of_birth', 'gender')
-    search_fields = ('full_name', 'rnn', 'iin', 'sic')
+# class IndividualClientAdmin(admin.ModelAdmin):
+#     list_display = ('full_name', 'gender', 'date_of_birth', 'place_of_birth', 'rnn', 'iin', 'sic', 'is_resident', 'country')
+#     list_filter = ( 'country', 'is_resident', 'place_of_birth', 'gender')
+#     search_fields = ('full_name', 'rnn', 'iin', 'sic')
 
 class DocsAdmin(admin.ModelAdmin):
     list_display = ('client', 'identity_card_type', 'number', 'start_date', 'end_date', 'issued_by')
@@ -14,9 +14,9 @@ class DocsAdmin(admin.ModelAdmin):
     search_fields = ('number', 'client')
 
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('short_name', 'full_name', 'sector', 'org_form', 'form_property', 'okpo', 'reg_num', 'reg_date', 'reg_org', 'certify_ser', 'certify_num')
+    list_display = ('short_name', 'full_name', 'sector', 'org_form', 'form_property', 'okpo', 'reg_date', 'reg_org', 'certify_ser', 'certify_num')
     list_filter = ('sector', 'org_form', 'form_property')
-    search_fields = ('short_name', 'full_name', 'reg_num', 'certify_num')
+    search_fields = ('short_name', 'full_name', 'certify_num')
 
 class AddressAdmin(admin.ModelAdmin):
     list_display = ('client', 'post_index', 'cities', 'areas', 'district', 'street', 'house', 'flat', 'addr_type')
@@ -35,8 +35,8 @@ class CompanyInline(admin.TabularInline):
     verbose_name_plural = "Компании Клиента"
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('individual_client', 'insert_date', 'emp')
-    search_fields = ('individual_client__full_name', 'individual_client__reg_num')
+    list_display = ('insert_date', 'emp')
+    # search_fields = ('individual_client__full_name', 'individual_client__reg_num')
     inlines = [CompanyInline]
     
 class ContactAdmin(admin.ModelAdmin):
@@ -45,7 +45,7 @@ class ContactAdmin(admin.ModelAdmin):
     search_fields = ('value', )
 
 
-admin.site.register(IndividualClient, IndividualClientAdmin)
+admin.site.register(IndividualClient)#, IndividualClientAdmin)
 admin.site.register(Docs, DocsAdmin)
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Address, AddressAdmin)

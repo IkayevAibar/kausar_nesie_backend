@@ -39,14 +39,14 @@ class AddressViewSet(viewsets.ModelViewSet):
             return AddressRetrieveSerializer
         return self.serializer_class
 
-class ClientFilter(FilterSet):
-    individual_client__rnn = CharFilter()
-    individual_client__iin = CharFilter()
-    individual_client__full_name = CharFilter()
-    class Meta:
-        model = Client
-        fields = ['individual_client__rnn','individual_client__iin', 'individual_client__full_name', 'individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
-    'individual_client__client_category']
+# class ClientFilter(FilterSet):
+#     individual_client__rnn = CharFilter()
+#     individual_client__iin = CharFilter()
+#     individual_client__full_name = CharFilter()
+#     class Meta:
+#         model = Client
+#         fields = ['individual_client__rnn','individual_client__iin', 'individual_client__full_name', 'individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
+#     'individual_client__client_category']
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -55,15 +55,21 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['is_individual']  # Добавляем поле фильтрации для отбора по типу клиента
+    search_fields = ['individualclient__full_name', 'company__full_name']  # Поля, по которым будет выполняться поиск
     # filterset_class = ClientFilter
 
-    search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
-        'individual_client__full_name',]
-    filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
-        'individual_client__client_category']
+    # search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
+    #     'individual_client__full_name',]
+    # filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
+    #     'individual_client__client_category']
 
     pagination_class = None
 
+    # def get_queryset(self):
+    #     query = Q(is_individual=True) | Q(is_individual=False)
+    #     return Client.objects.filter(query)
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -94,42 +100,42 @@ class ClientViewSet(viewsets.ModelViewSet):
 
         return Response({'success': 'Транзакция прошла успешно'}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'])
-    def search_individual_client(self, request):
-        query = request.GET.get('query')
-        if query:
-            clients = self.filter_queryset(self.get_queryset()).filter(
-                Q(individual_client__full_name__icontains=query) 
-            ).distinct()
-        else:
-            clients = self.filter_queryset(self.get_queryset())
+    # @action(detail=False, methods=['get'])
+    # def search_individual_client(self, request):
+    #     query = request.GET.get('query')
+    #     if query:
+    #         clients = self.filter_queryset(self.get_queryset()).filter(
+    #             Q(individual_client__full_name__icontains=query) 
+    #         ).distinct()
+    #     else:
+    #         clients = self.filter_queryset(self.get_queryset())
         
-        page = self.paginate_queryset(clients)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+    #     page = self.paginate_queryset(clients)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(clients, many=True)
-        return Response(serializer.data)
+    #     serializer = self.get_serializer(clients, many=True)
+    #     return Response(serializer.data)
     
-    @action(detail=False, methods=['get'])
-    def search_company_client(self, request):
-        query = request.GET.get('query')
-        if query:
-            clients = self.filter_queryset(self.get_queryset()).filter(
-                Q(company_owners__short_name__icontains=query) |
-                Q(company_owners__full_name__icontains=query)
-            ).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0).distinct()
-        else:
-            clients = self.filter_queryset(self.get_queryset()).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0)
+    # @action(detail=False, methods=['get'])
+    # def search_company_client(self, request):
+    #     query = request.GET.get('query')
+    #     if query:
+    #         clients = self.filter_queryset(self.get_queryset()).filter(
+    #             Q(company_owners__short_name__icontains=query) |
+    #             Q(company_owners__full_name__icontains=query)
+    #         ).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0).distinct()
+    #     else:
+    #         clients = self.filter_queryset(self.get_queryset()).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0)
         
-        page = self.paginate_queryset(clients)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+    #     page = self.paginate_queryset(clients)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(clients, many=True)
-        return Response(serializer.data)
+    #     serializer = self.get_serializer(clients, many=True)
+    #     return Response(serializer.data)
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve', 'search_company_client', 'search_individual_client']:
@@ -142,18 +148,18 @@ class ClientViewSet(viewsets.ModelViewSet):
     def get_last_num_reg(self, request):
         last_client = Client.objects.order_by('-id').first()  # Получаем последнего клиента по id
         if last_client:
-            last_num_reg = last_client.individual_client.reg_number
+            last_num_reg = last_client.reg_num
             last_num_int = int(last_num_reg)  # Предполагаем, что reg_number является числом
         else:
             last_num_int = 0
 
         while True:
             new_num_int = last_num_int + 1
-            new_num_reg = str(new_num_int).zfill(6)  # Преобразуем в строку, заполняя нулями до 6 символов
+            new_num_reg = str(new_num_int).zfill(4)  # Преобразуем в строку, заполняя нулями до 6 символов
 
             try:
                 # Проверяем, нет ли в базе данных клиента с таким номером
-                Client.objects.get(individual_client__reg_number=new_num_reg)
+                Client.objects.get(reg_num=new_num_reg)
             except Client.DoesNotExist:
                 # Если клиент с таким номером не найден, значит, это уникальный номер
                 break
@@ -183,7 +189,8 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
         # Instead of returning the full serialized data, return only the 'id' field
         return Response({'company_id': serializer.instance.id}, status=status.HTTP_201_CREATED)
-    
+
+
     @action(detail=False, methods=['get'])
     def get_last_num_reg(self, request):
         last_object = Company.objects.order_by('-id').first()  # Получаем последнего клиента по id
