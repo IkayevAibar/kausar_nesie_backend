@@ -167,7 +167,7 @@ class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         # fields = "__all__"
-        exclude = ['owners']
+        exclude = ['workers']
 
 class CompanyInClientRetrieveSerializer(serializers.ModelSerializer):
     """Юр лица"""
@@ -177,7 +177,7 @@ class CompanyInClientRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        exclude = ['owners']
+        exclude = ['workers']
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -344,7 +344,10 @@ class ClientAddBalanceToAccountSerializer(serializers.Serializer):
     """Пополнение счета клиента"""
     amount = serializers.CharField(required=True)
 
-
+class ClientAddOwnerToCompanySerializer(serializers.Serializer):
+    """Добавление владельца к компании"""
+    individual_client = serializers.CharField(required=True)
+    share = serializers.CharField(required=True)
 
 class ClientSerializer(serializers.ModelSerializer):  
     # id = serializers.UUIDField(read_only=True)
@@ -399,15 +402,10 @@ class CompanyRetrieveSerializer(serializers.ModelSerializer):
     sector = SectorEconSerializer(read_only=True)
     org_form = OrgFormSerializer(read_only=True)
     form_property = FormPropertySerializer(read_only=True)
-    owners = ClientSerializer(read_only=True, many=True)
+    workers = ClientSerializer(read_only=True, many=True)
     class Meta:
         model = Company
         fields = "__all__"
-
-
-class CompanyAddOwnerSerializer(serializers.Serializer):
-    """Добавление владельца"""
-    owner_id = serializers.CharField(required=True)
 
 class CompanyAddRequisiteSerializer(serializers.Serializer):
     """Добавление реквизитов"""

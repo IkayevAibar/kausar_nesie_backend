@@ -70,13 +70,28 @@ class Company(Client):
     certify_num = models.CharField(max_length=20, verbose_name="Номер рег. удостоврения", blank=True, null=True)
     country = models.ForeignKey('catalog.Country', verbose_name="Страна", null=True, blank=True, on_delete=models.CASCADE)
 
-    owners = models.ManyToManyField('Client', related_name='company_owners', blank=True)
+    workers = models.ManyToManyField('Client', related_name='company_workers', blank=True)
     def __str__(self):
         return f"{self.short_name}"
 
     class Meta:
         verbose_name = "Юридическое лицо"
         verbose_name_plural = "Юридические лица"
+
+class CompanyOwner(models.Model):
+    company = models.ForeignKey('Company', verbose_name="Идентификатор компании", on_delete=models.CASCADE,
+                                related_name='owners')
+    individual = models.ForeignKey('IndividualClient', verbose_name="Идентификатор физического лица",
+                                      on_delete=models.CASCADE, related_name='individual_owner')
+    share = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Доля владения", blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.company}"
+    
+    class Meta:
+        unique_together = ('company', 'individual')
+        verbose_name = "Владелец компании"
+        verbose_name_plural = "Владельцы компании"
 
 class Docs(models.Model):
     """Документы"""

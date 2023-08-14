@@ -57,19 +57,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['is_individual']  # Добавляем поле фильтрации для отбора по типу клиента
     search_fields = ['individualclient__full_name', 'company__full_name']  # Поля, по которым будет выполняться поиск
-    # filterset_class = ClientFilter
-
-    # search_fields = ['individual_client__reg_number', 'individual_client__iin', '^individual_client__full_name', '=individual_client__full_name', \
-    #     'individual_client__full_name',]
-    # filterset_fields = ['individual_client__gender', 'individual_client__is_resident', 'individual_client__country', \
-    #     'individual_client__client_category']
-
     pagination_class = None
 
-    # def get_queryset(self):
-    #     query = Q(is_individual=True) | Q(is_individual=False)
-    #     return Client.objects.filter(query)
-    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -78,6 +67,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         # Instead of returning the full serialized data, return only the 'id' field
         return Response({'client_id': serializer.instance.id}, status=status.HTTP_201_CREATED)
     
+
     @action(detail=True, methods=['post'])
     def add_balance_to_account(self, request, pk=None):
         client = self.get_object()
@@ -99,43 +89,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Транзакция не удалась'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': 'Транзакция прошла успешно'}, status=status.HTTP_200_OK)
-
-    # @action(detail=False, methods=['get'])
-    # def search_individual_client(self, request):
-    #     query = request.GET.get('query')
-    #     if query:
-    #         clients = self.filter_queryset(self.get_queryset()).filter(
-    #             Q(individual_client__full_name__icontains=query) 
-    #         ).distinct()
-    #     else:
-    #         clients = self.filter_queryset(self.get_queryset())
-        
-    #     page = self.paginate_queryset(clients)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-
-    #     serializer = self.get_serializer(clients, many=True)
-    #     return Response(serializer.data)
-    
-    # @action(detail=False, methods=['get'])
-    # def search_company_client(self, request):
-    #     query = request.GET.get('query')
-    #     if query:
-    #         clients = self.filter_queryset(self.get_queryset()).filter(
-    #             Q(company_owners__short_name__icontains=query) |
-    #             Q(company_owners__full_name__icontains=query)
-    #         ).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0).distinct()
-    #     else:
-    #         clients = self.filter_queryset(self.get_queryset()).annotate(num_owners=Count('company_owners')).filter(num_owners__gt=0)
-        
-    #     page = self.paginate_queryset(clients)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-
-    #     serializer = self.get_serializer(clients, many=True)
-    #     return Response(serializer.data)
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve', 'search_company_client', 'search_individual_client']:
@@ -179,7 +132,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
         if self.action == 'list' or self.action == 'retrieve':
             return CompanyRetrieveSerializer
         if self.action == 'add_owner_to_company':
-            return CompanyAddOwnerSerializer
+            return ClientAddOwnerToCompanySerializer
         return self.serializer_class
     
     def create(self, request, *args, **kwargs):
@@ -229,14 +182,23 @@ class CompanyViewSet(viewsets.ModelViewSet):
             return Response({'error': 'owner_id не указан'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            owner = Client.objects.get(id=owner_id)
-        except Client.DoesNotExist:
-            return Response({'error': 'Клиент не найден'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        company.owners.add(owner)
-        company.save()
+            share = request.data['share']
+        except KeyError:
+            return Response({'error': 'share не указан'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'success': 'Сохранено'}, status=status.HTTP_200_OK)
+        try:
+            owner = IndividualClient.objects.get(id=owner_id)
+        except IndividualClient.DoesNotExist:
+            return Response({'error': 'Владелец не найден'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            CompanyOwner.objects.create(company=company, owner=owner, share=share)
+        except:
+            return Response({'error': 'Владелец уже добавлен'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        return Response({'success': 'Владелец добавлен'}, status=status.HTTP_200_OK)
+
 
 class AccountFilter(FilterSet):
     id = CharFilter()

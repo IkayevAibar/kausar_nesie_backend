@@ -29,7 +29,7 @@ class AccountAdmin(admin.ModelAdmin):
     search_fields = ('acc_num', 'flat')
 
 class CompanyInline(admin.TabularInline):
-    model = Company.owners.through
+    model = Company.workers.through
     extra = 0
     verbose_name = "Компания Клиента"
     verbose_name_plural = "Компании Клиента"
