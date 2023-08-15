@@ -28,6 +28,16 @@ class CreditGetSerializer(serializers.ModelSerializer):
         model = Credit
         fields = "__all__"
 
+class CreditRecalculatePaymentScheduleStandardSerializer(serializers.Serializer):
+    payment_amount = serializers.DecimalField(max_digits=20, decimal_places=2, required=True)
+    payment_number = serializers.IntegerField(required=True)
+    new_month_number = serializers.IntegerField(required=False)
+
+class CreditPaymentScheduleStandardSerializer(serializers.Serializer):
+    payment_number = serializers.IntegerField(required=True)
+    payment_date = serializers.DateField(required=False)
+
+
 class CreditTreatmentsSerializer(serializers.ModelSerializer):
     
     class Meta:

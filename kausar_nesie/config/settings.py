@@ -190,6 +190,19 @@ SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "Oauth.serializers.CustomTokenObtainPairSerializer",
 }
 
+SWAGGER_SETTINGS = {
+    # 'SECURITY_DEFINITIONS': {
+    #     'Bearer': {
+    #             'type': 'apiKey',
+    #             'name': 'Authorization',
+    #             'in': 'header'
+    #     }
+    # },
+    'DOC_EXPANSION': 'none',
+    'OPERATIONS_SORTER': 'method',
+
+}
+
 
 CORS_ALLOW_ALL_ORIGINS = True
 
