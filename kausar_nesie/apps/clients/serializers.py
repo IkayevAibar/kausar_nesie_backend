@@ -295,28 +295,49 @@ class DocsSerializer(serializers.ModelSerializer):
 class ContactSerializer(serializers.ModelSerializer):
     """Контакты"""
 
-    def validate_value(self, value):
+    # def validate_value(self, value):
+    #     """
+    #     Валидация поля value: проверяем, что поле не пустое,
+    #     а также что содержимое является либо электронной почтой, либо номером телефона.
+    #     """
+    #     if not value.strip():
+    #         raise serializers.ValidationError("Поле 'Значение' не может быть пустым.")
+
+    #     # Получаем значение типа контакта из данных сериализации
+    #     contact_type = self.initial_data.get('contact_type')
+
+    #     # Проверка на электронную почту
+    #     if contact_type == "3" or contact_type == "5":
+    #         if not re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
+    #             raise serializers.ValidationError("Некорректный формат электронной почты.")
+
+    #     # Проверка на номер телефона
+    #     if contact_type == "1" or contact_type == "2" or contact_type == "4":
+    #         if not re.match(r'^\+?[0-9]+$', value):
+    #             raise serializers.ValidationError("Некорректный формат номера телефона.")
+
+    #     return value
+    def validate(self, data):
         """
-        Валидация поля value: проверяем, что поле не пустое,
+        Валидация контактов: проверяем, что поле value не пустое,
         а также что содержимое является либо электронной почтой, либо номером телефона.
         """
+        contacts = data
+        value = contacts.get('value')
+        contact_type = contacts.get('contact_type')
+
         if not value.strip():
             raise serializers.ValidationError("Поле 'Значение' не может быть пустым.")
 
-        # Получаем значение типа контакта из данных сериализации
-        contact_type = self.initial_data.get('contact_type')
-
-        # Проверка на электронную почту
-        if contact_type == "3" or contact_type == "5":
+        if contact_type == 3 or contact_type == 5:
             if not re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
                 raise serializers.ValidationError("Некорректный формат электронной почты.")
 
-        # Проверка на номер телефона
-        if contact_type == "1" or contact_type == "2" or contact_type == "4":
+        if contact_type in [1, 2, 4]:
             if not re.match(r'^\+?[0-9]+$', value):
                 raise serializers.ValidationError("Некорректный формат номера телефона.")
 
-        return value
+        return contacts
     
     class Meta:
         model = Contact

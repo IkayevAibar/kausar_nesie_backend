@@ -255,3 +255,12 @@ class ContactViewSet(viewsets.ModelViewSet):
             return ContactRetrieveSerializer
         return self.serializer_class
 
+    def create(self, request, *args, **kwargs):
+        contacts_data = request.data
+        if isinstance(contacts_data, list):
+            serializer = self.get_serializer(data=contacts_data, many=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return super().create(request, *args, **kwargs)
