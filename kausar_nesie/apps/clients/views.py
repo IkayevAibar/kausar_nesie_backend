@@ -14,7 +14,6 @@ from django_excel_response import ExcelResponse
 from .serializers import *
 from .models import *
 
-#
 class IndividualClientViewSet(viewsets.ModelViewSet):
     """Физические лица"""
     queryset = IndividualClient.objects.all()
