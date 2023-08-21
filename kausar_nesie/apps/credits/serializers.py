@@ -57,6 +57,9 @@ class CreditLineSerializer(serializers.ModelSerializer):
         model = CreditLine
         fields = "__all__"
 
+class CreditLineAddCreditSerializer(serializers.Serializer):
+    credit_id = serializers.IntegerField(required=True)
+
 class RequisiteSerializer(serializers.ModelSerializer):
     """Requisite Create/Update"""
 

@@ -902,7 +902,7 @@ class CreditViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post']) 
     def payment(self, request, pk=None):
         """
-        payment_number ,payment_date
+        payment_number* ,payment_date
         """
         credit = self.get_object()
         payment_number = request.data.get('payment_number')
@@ -941,7 +941,6 @@ class CreditViewSet(viewsets.ModelViewSet):
         total_payment = credit_payment_schedule.total_payment + credit_payment_schedule.penalty_commission
         if(balance < total_payment):
             not_enough_money = False
-
             if(balance > credit_payment_schedule.principal_payment):
                 account_action_status = self.discharge_account(self, credit.client, credit_payment_schedule.principal_payment)
                 balance = self.get_account_balance(self, credit.client)
@@ -1028,6 +1027,11 @@ class CreditLineViewSet(viewsets.ModelViewSet):
     queryset = CreditLine.objects.all()
     serializer_class = CreditLineSerializer
     permission_classes = [permissions.AllowAny]
+
+    def get_serializer_class(self):
+        if self.action == 'add_credit':
+            return CreditLineAddCreditSerializer
+        return super().get_serializer_class()
 
     @action(detail=False, methods=['get'])
     def get_last_num_reg(self, request):
